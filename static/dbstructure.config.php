@@ -2213,6 +2213,41 @@ return [
 			"uid_album" => ["uid", "album(64)"],
 		],
 	],
+	"udp_allowlist" => [
+		"comment" => "UDP Social federation allowlist — domains permitted to send/receive AP traffic with this slot",
+		"fields" => [
+			"id"             => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
+			"slot_domain"    => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "This slot's hostname"],
+			"allowed_domain" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Permitted remote hostname"],
+			"source"         => ["type" => "varchar(32)", "not null" => "1", "default" => "peer", "comment" => "How this entry was added: peer, relay, admin"],
+			"created_at"     => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "When the entry was added"],
+		],
+		"indexes" => [
+			"PRIMARY"              => ["id"],
+			"slot_allowed_domain"  => ["UNIQUE", "slot_domain", "allowed_domain"],
+		],
+	],
+	"udp_takedown" => [
+		"comment" => "UDP Social DMCA and content takedown requests",
+		"fields" => [
+			"id"                 => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
+			"status"             => ["type" => "varchar(32)", "not null" => "1", "default" => "open", "comment" => "open, actioned, dismissed"],
+			"complainant_name"   => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+			"complainant_email"  => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
+			"claimed_work"       => ["type" => "text", "comment" => "Description of the copyrighted work"],
+			"claimed_url"        => ["type" => "varchar(2048)", "not null" => "1", "default" => "", "comment" => "URL of the allegedly infringing content"],
+			"post_uri_id"        => ["type" => "int unsigned", "default" => "0", "foreign" => ["item-uri" => "id"], "comment" => "Resolved local post uri-id, if found"],
+			"notes"              => ["type" => "text", "comment" => "Admin notes or complainant details"],
+			"action_taken"       => ["type" => "varchar(64)", "not null" => "1", "default" => "", "comment" => "post_deleted, post_deleted_account_blocked, dismissed"],
+			"reviewer_uid"       => ["type" => "mediumint unsigned", "default" => "0", "foreign" => ["user" => "uid"], "comment" => "Admin who reviewed"],
+			"received_at"        => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"actioned_at"        => ["type" => "datetime", "comment" => "When the admin took action"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["id"],
+			"status"  => ["status"],
+		],
+	],
 	"worker-ipc" => [
 		"comment" => "Inter process communication between the frontend and the worker",
 		"fields"  => [
