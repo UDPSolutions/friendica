@@ -95,53 +95,74 @@ class Follow extends BaseModule
 			$this->baseUrl->redirect($returnPath);
 		}
 
-		$submit = $this->t('Submit Request');
+		$submit   = $this->t('Submit Request');
+		$contact  = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'alias' => '', 'keywords' => ''];
+		$protocol = Protocol::PHANTOM;
 
-		// Don't try to add a pending contact
-		$userContact = Contact::selectFirst(['pending'], [
-			"`uid` = ? AND ((`rel` != ?) OR (`network` = ?)) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
-			$uid, Contact::FOLLOWER, Protocol::DFRN,
-			Strings::normaliseLink($url),
-			Strings::normaliseLink($url), $url]);
-
-		if (!empty($userContact['pending'])) {
-			$this->sysMessages->addNotice($this->t('You already added this contact.'));
-			$submit = '';
+		// Gate before any network probe: extract the domain from the raw input.
+		// Handles both URL form (https://domain/user) and handle form (user@domain).
+		$earlyDomain = parse_url($url, PHP_URL_HOST) ?? '';
+		if (empty($earlyDomain) && str_contains($url, '@')) {
+			$parts = explode('@', ltrim($url, '@'), 2);
+			$earlyDomain = $parts[1] ?? '';
 		}
-
-		$contact = Contact::getByURL($url, true);
-
-		// Possibly it is a mail contact
-		if (empty($contact)) {
-			$contact = Probe::uri($url, Protocol::MAIL, $uid);
-		}
-
-		if (empty($contact) || ($contact['network'] == Protocol::PHANTOM)) {
-			// Possibly it is a remote item and not an account
-			$this->followRemoteItem($url);
-
-			$this->sysMessages->addNotice($this->t('The network type couldn\'t be detected. Contact can\'t be added.'));
-			$submit  = '';
-			$contact = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'alias' => '', 'keywords' => ''];
-		}
-
-		$protocol = Contact::getProtocol($contact['url'], $contact['network']);
-
-		if (($protocol == Protocol::DIASPORA) && !$this->config->get('system', 'diaspora_enabled')) {
-			$this->sysMessages->addNotice($this->t('Diaspora support isn\'t enabled. Contact can\'t be added.'));
-			$submit = '';
-		}
-
-		$targetDomain = parse_url($contact['url'], PHP_URL_HOST) ?? '';
-		if (!empty($targetDomain)
-			&& in_array($protocol, [Protocol::ACTIVITYPUB, Protocol::DFRN])
-			&& !DI::federationGateway()->isAllowedOutbound($targetDomain)
-		) {
+		$blockedEarly = !empty($earlyDomain) && !DI::federationGateway()->isAllowedOutbound($earlyDomain);
+		if ($blockedEarly) {
 			$this->sysMessages->addNotice($this->t(
-				'%s is on a server that isn\'t connected to your network. Ask your admin to add it.',
-				$contact['name']
+				'%s is not connected to your network. Ask your admin to add it.',
+				$earlyDomain
 			));
 			$submit = '';
+		}
+
+		if (!$blockedEarly) {
+			// Don't try to add a pending contact
+			$userContact = Contact::selectFirst(['pending'], [
+				"`uid` = ? AND ((`rel` != ?) OR (`network` = ?)) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
+				$uid, Contact::FOLLOWER, Protocol::DFRN,
+				Strings::normaliseLink($url),
+				Strings::normaliseLink($url), $url]);
+
+			if (!empty($userContact['pending'])) {
+				$this->sysMessages->addNotice($this->t('You already added this contact.'));
+				$submit = '';
+			}
+
+			$contact = Contact::getByURL($url, true);
+
+			// Possibly it is a mail contact
+			if (empty($contact)) {
+				$contact = Probe::uri($url, Protocol::MAIL, $uid);
+			}
+
+			if (empty($contact) || ($contact['network'] == Protocol::PHANTOM)) {
+				// Possibly it is a remote item and not an account
+				$this->followRemoteItem($url);
+
+				$this->sysMessages->addNotice($this->t('That address couldn\'t be found or doesn\'t support connecting. Check the handle and try again.'));
+				$submit  = '';
+				$contact = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'alias' => '', 'keywords' => ''];
+			}
+
+			$protocol = Contact::getProtocol($contact['url'], $contact['network']);
+
+			if (($protocol == Protocol::DIASPORA) && !$this->config->get('system', 'diaspora_enabled')) {
+				$this->sysMessages->addNotice($this->t('Diaspora support isn\'t enabled. Contact can\'t be added.'));
+				$submit = '';
+			}
+
+			// Backstop: probe may resolve a different domain than the input (redirects, aliases).
+			$targetDomain = parse_url($contact['url'], PHP_URL_HOST) ?? '';
+			if (!empty($targetDomain)
+				&& in_array($protocol, [Protocol::ACTIVITYPUB, Protocol::DFRN])
+				&& !DI::federationGateway()->isAllowedOutbound($targetDomain)
+			) {
+				$this->sysMessages->addNotice($this->t(
+					'%s is on a server that isn\'t connected to your network. Ask your admin to add it.',
+					$contact['name']
+				));
+				$submit = '';
+			}
 		}
 
 		if ($protocol == Protocol::MAIL) {
