@@ -34,11 +34,12 @@ class Widget
 	public static function follow(string $value = ''): string
 	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('widget/follow.tpl'), [
-			'$connect' => DI::l10n()->t('Add New Contact'),
-			'$desc'    => DI::l10n()->t('Enter address or web location'),
-			'$hint'    => DI::l10n()->t('user@x.tld, x.tld/user'),
-			'$value'   => $value,
-			'$follow'  => DI::l10n()->t('Connect'),
+			'$connect'  => DI::l10n()->t('Add New Contact'),
+			'$desc'     => DI::l10n()->t('Enter address or web location'),
+			'$hint'     => DI::l10n()->t('user@x.tld, x.tld/user'),
+			'$value'    => $value,
+			'$follow'   => DI::l10n()->t('Connect'),
+			'$is_admin' => DI::userSession()->isSiteAdmin(),
 		]);
 	}
 
