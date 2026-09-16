@@ -1,6 +1,6 @@
 <?php
 
-// UDP Social customization — user-accessible node-pairing invite via email
+// UDP Social customization — admin-only node-pairing invite via email
 // SPDX-FileCopyrightText: 2010-2024 the Friendica project
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -11,7 +11,7 @@ use Friendica\DI;
 use Friendica\Network\HTTPException;
 
 /**
- * Lets any logged-in user send a node-pairing invitation by email.
+ * Lets site admins send a node-pairing invitation by email.
  *
  * POST /contact/invite
  *
@@ -28,10 +28,9 @@ class Invite extends BaseModule
 			throw new HTTPException\UnauthorizedException();
 		}
 
-		// FIXME: This endpoint generates an admin-level QR/token and must be
-		// restricted to site admins. Currently any logged-in user can trigger it,
-		// which exposes the node-pairing credential to non-admin accounts.
-		// Fix: add isSiteAdmin() check and return 403 otherwise.
+		if (!DI::userSession()->isSiteAdmin()) {
+			throw new HTTPException\ForbiddenException();
+		}
 
 		$recipientEmail = trim($request['invite_email'] ?? '');
 		if (!$recipientEmail || !filter_var($recipientEmail, FILTER_VALIDATE_EMAIL)) {
