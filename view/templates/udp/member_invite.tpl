@@ -4,11 +4,18 @@
 			<h3 class="panel-title">Invite a friend</h3>
 		</div>
 		<div class="panel-body">
+			{{if $is_admin}}
 			<p>
-				Want to connect with someone? Enter their email address to invite them to join
-				this community, or their Fediverse handle if they already have an account on
+				Enter an email address to send a registration invite directly, or a Fediverse
+				handle if your friend is already on another node (e.g. <code>@jane@theirnode.com</code>).
+			</p>
+			{{else}}
+			<p>
+				Want to connect with someone? Enter their email address to request an invite
+				on their behalf, or their Fediverse handle if they already have an account on
 				another node (e.g. <code>@jane@theirnode.com</code>).
 			</p>
+			{{/if}}
 
 			<form action="{{$baseurl}}/udp/member-invite" method="post">
 				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
@@ -20,12 +27,16 @@
 				</div>
 
 				<div class="form-group">
-					<label for="note">Note to admin <span class="text-muted">(optional)</span></label>
+					<label for="note">{{if $is_admin}}Personal note <span class="text-muted">(optional, included in invite email)</span>{{else}}Note to admin <span class="text-muted">(optional)</span>{{/if}}</label>
 					<textarea id="note" name="note" class="form-control" rows="3"
 						placeholder="How do you know this person?"></textarea>
 				</div>
 
+				{{if $is_admin}}
+				<button type="submit" class="btn btn-primary">Send invite</button>
+				{{else}}
 				<button type="submit" class="btn btn-primary">Send request to admin</button>
+				{{/if}}
 			</form>
 		</div>
 	</div>

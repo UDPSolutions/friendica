@@ -242,6 +242,7 @@ class MemberInvite extends BaseModule
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('udp/member_invite.tpl'), [
 			'$baseurl'              => (string) DI::baseUrl(),
 			'$form_security_token'  => self::getFormSecurityToken('udp_member_invite'),
+			'$is_admin'             => DI::userSession()->isSiteAdmin(),
 		]);
 	}
 }
