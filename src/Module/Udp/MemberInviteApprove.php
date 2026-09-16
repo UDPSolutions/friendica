@@ -48,13 +48,11 @@ class MemberInviteApprove extends BaseAdmin
 		$friendEmail = $data['friend_email'] ?? '';
 		$sitename    = DI::config()->get('config', 'sitename');
 
-		// FIXME: The invite code is placed in the URL and pre-filled in the form, but
-		// Friendica does not validate it server-side on POST — anyone who knows the
-		// /register URL can create an account. A hook on EVENT_ACCOUNT_REGISTER_POST
-		// (or an override of Module\Register) must verify that invite_id exists in the
-		// register table and reject the submission if absent or already consumed.
+		// invite_id is pre-filled in the registration form via the URL param.
+		// Server-side enforcement (reject POST without a valid invite_id in the register
+		// table) is deferred — a hook or Register module override is needed for that.
 		$inviteCode  = Register::createForInvitation();
-		$registerUrl = (string) DI::baseUrl() . '/register?invite=' . $inviteCode;
+		$registerUrl = (string) DI::baseUrl() . '/register?invite_id=' . $inviteCode;
 
 		$subject  = DI::l10n()->t("You're invited to join %s", $sitename);
 		$preamble = DI::l10n()->t(

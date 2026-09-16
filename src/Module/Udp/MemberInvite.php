@@ -203,7 +203,7 @@ class MemberInvite extends BaseModule
 	private function sendInviteDirect(string $friendEmail, string $requesterName, string $sitename): void
 	{
 		$inviteCode  = Register::createForInvitation();
-		$registerUrl = (string) DI::baseUrl() . '/register?invite=' . $inviteCode;
+		$registerUrl = (string) DI::baseUrl() . '/register?invite_id=' . $inviteCode;
 
 		$subject  = DI::l10n()->t("You're invited to join %s", $sitename);
 		$preamble = DI::l10n()->t(

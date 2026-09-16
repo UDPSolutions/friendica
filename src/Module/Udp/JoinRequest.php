@@ -50,7 +50,7 @@ class JoinRequest extends BaseModule
 
 		// Create a single-use invite code so registration works even on closed nodes.
 		$inviteCode = Register::createForInvitation();
-		$registerUrl = (string) DI::baseUrl() . '/register?invite=' . $inviteCode;
+		$registerUrl = (string) DI::baseUrl() . '/register?invite_id=' . $inviteCode;
 
 		$sitename = DI::config()->get('config', 'sitename');
 		$subject  = DI::l10n()->t('Your request to join %s has been accepted', $sitename);
