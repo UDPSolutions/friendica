@@ -540,11 +540,24 @@
 	var formSubmitting = false;
 	function setFormSubmitting() {
 		formSubmitting = true;
-		var ta = document.getElementById('comment-edit-text-' + FORM_ID);
+		var ta  = document.getElementById('comment-edit-text-' + FORM_ID);
 		if (ta && window.PhotoTokenizer) {
 			ta.value = window.PhotoTokenizer.expand(ta.value);
 			window.PhotoTokenizer.clear();
 		}
+
+		// Visual feedback: disable submit button and show spinner
+		var btn = document.getElementById('comment-edit-submit-' + FORM_ID);
+		if (btn) {
+			var label = btn.textContent.trim();
+			// "Post" → "Posting…", "Save" → "Saving…", anything else → "<label>…"
+			var verbMap = { 'Post': 'Posting…', 'Save': 'Saving…' };
+			var inFlight = verbMap[label] || (label + '…');
+			btn.disabled = true;
+			btn.innerHTML = '<i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i> ' + inFlight;
+		}
+		var rotator = document.getElementById('profile-rotator');
+		if (rotator) { rotator.style.display = ''; }
 	}
 
 	window.addEventListener('beforeunload', function(event) {

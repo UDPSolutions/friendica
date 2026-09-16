@@ -287,4 +287,13 @@ can load different content into the jot modal (e.g. the item edit jot)
 		for (var i = 0; i < files.length; i++) { dzJot.addFile(files[i]); }
 		this.value = '';
 	});
+	document.getElementById('profile-jot-form').addEventListener('submit', function() {
+		var btn = document.getElementById('profile-jot-submit');
+		if (btn) {
+			btn.disabled = true;
+			btn.innerHTML = '<i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i> Posting…';
+		}
+		var rotator = document.getElementById('profile-rotator');
+		if (rotator) { rotator.style.display = ''; }
+	});
 </script>
