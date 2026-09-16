@@ -23,12 +23,6 @@
 			<a href="lostpass" id="lost-password-link">{{$lostlink}}</a>
 		</div>
 
-		{{if $openid}}
-		<div id="login_openid">
-			{{include file="field_openid.tpl" field=$lopenid}}
-		</div>
-		{{/if}}
-
 		{{include file="field_checkbox.tpl" field=$lremember}}
 
 		<button type="submit" name="submit" id="login-submit-button" class="btn btn-primary" value="{{$login}}">{{$login}}</button>
@@ -40,15 +34,6 @@
 		<div id="login-end"></div>
 	</div>
 </form>
-
-{{if $register}}
-<hr>
-<div id="login-extra-links">
-	<p id="new-here">{{$new}}</p>
-	<h3 id="login-head" class="sr-only">{{$register.title}}</h3>
-	<a href="{{$register.url}}" id="register-link" class="btn btn-default">{{$register.title}}</a>
-</div>
-{{/if}}
 
 {{* Background image attribution — update when image changes *}}
 <p id="udp-login-attribution">
