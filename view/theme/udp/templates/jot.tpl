@@ -180,6 +180,7 @@
 					{{$acl nofilter}}
 					{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 					{{if $created_at}}{{$created_at nofilter}}{{/if}}
+					{{$event_time nofilter}}
 				</div>
 
 				<div id="jot-preview-content" class="minimize" aria-labelledby="jot-preview-lnk" role="tabpanel" aria-hidden="true"></div>
