@@ -2239,7 +2239,7 @@ return [
 			"complainant_email"  => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 			"claimed_work"       => ["type" => "text", "comment" => "Description of the copyrighted work"],
 			"claimed_url"        => ["type" => "varchar(2048)", "not null" => "1", "default" => "", "comment" => "URL of the allegedly infringing content"],
-			"post_uri_id"        => ["type" => "int unsigned", "default" => "0", "foreign" => ["item-uri" => "id"], "comment" => "Resolved local post uri-id, if found"],
+			"post_uri_id"        => ["type" => "int unsigned", "default" => "0", "comment" => "Resolved local post uri-id, if found"],
 			"notes"              => ["type" => "text", "comment" => "Admin notes or complainant details"],
 			"action_taken"       => ["type" => "varchar(64)", "not null" => "1", "default" => "", "comment" => "post_deleted, post_deleted_account_blocked, dismissed"],
 			"reviewer_uid"       => ["type" => "mediumint unsigned", "default" => "0", "foreign" => ["user" => "uid"], "comment" => "Admin who reviewed"],
