@@ -183,72 +183,22 @@ class Xrd extends BaseModule
 
 	private function printJSON(string $alias, array $owner, array $avatar)
 	{
-		$baseURL     = (string) $this->baseUrl;
-		$hideAvatar  = DI::config()->get('udp', 'gateway_enabled', true);
-
+		// AP-only JRD. Legacy links (DFRN, Diaspora seed, salmon, OStatus,
+		// OpenWebAuth) are omitted — Probe::uri() treats any recognized legacy
+		// link as a protocol match and short-circuits before reaching AP.
 		$json = [
 			'subject' => 'acct:' . $owner['addr'],
 			'aliases' => [
 				$alias,
 				$owner['url'],
 			],
-			'links' => array_values(array_filter([
-				[
-					'rel'  => ActivityNamespace::DFRN,
-					'href' => $owner['url'],
-				],
-				[
-					'rel'  => ActivityNamespace::FEED,
-					'type' => 'application/atom+xml',
-					'href' => $owner['poll'],
-				],
-				[
-					'rel'  => ActivityNamespace::WEBFINGERPROFILE,
-					'type' => 'text/html',
-					'href' => $owner['url'],
-				],
+			'links' => [
 				[
 					'rel'  => 'self',
 					'type' => 'application/activity+json',
 					'href' => $owner['url'],
 				],
-				[
-					'rel'  => ActivityNamespace::HCARD,
-					'type' => 'text/html',
-					'href' => $baseURL . '/hcard/' . $owner['nickname'],
-				],
-				$hideAvatar ? null : [
-					'rel'  => ActivityNamespace::WEBFINGERAVATAR,
-					'type' => $avatar['type'],
-					'href' => User::getAvatarUrl($owner),
-				],
-				[
-					'rel'  => ActivityNamespace::DIASPORA_SEED,
-					'type' => 'text/html',
-					'href' => $baseURL,
-				],
-				[
-					'rel'  => 'salmon',
-					'href' => $baseURL . '/receive/users/' . $owner['guid'],
-				],
-				[
-					'rel'      => ActivityNamespace::OSTATUSSUB,
-					'template' => $baseURL . '/contact/follow?url={uri}',
-				],
-				[
-					'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
-					'template' => $baseURL . '/contact/follow?url={object}',
-				],
-				[
-					'rel'      => ActivityNamespace::FEP3B86_CREATE,
-					'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
-				],
-				[
-					'rel'  => ActivityNamespace::OPENWEBAUTH,
-					'type' => 'application/x-zot+json',
-					'href' => $baseURL . '/owa',
-				],
-			])),
+			],
 		];
 
 		header('Access-Control-Allow-Origin: *');
@@ -257,9 +207,7 @@ class Xrd extends BaseModule
 
 	private function printXML(string $alias, array $owner, array $avatar)
 	{
-		$baseURL    = (string) $this->baseUrl;
-		$hideAvatar = DI::config()->get('udp', 'gateway_enabled', true);
-
+		// AP-only XRD. Legacy links omitted for the same reason as printJSON.
 		$xmlString = XML::fromArray([
 			'XRD' => [
 				'@attributes' => [
@@ -270,81 +218,9 @@ class Xrd extends BaseModule
 				'2:Alias' => $alias,
 				'1:link'  => [
 					'@attributes' => [
-						'rel'  => ActivityNamespace::DFRN,
-						'href' => $owner['url'],
-					],
-				],
-				'2:link' => [
-					'@attributes' => [
-						'rel'  => ActivityNamespace::FEED,
-						'type' => 'application/atom+xml',
-						'href' => $owner['poll'],
-					],
-				],
-				'3:link' => [
-					'@attributes' => [
-						'rel'  => ActivityNamespace::WEBFINGERPROFILE,
-						'type' => 'text/html',
-						'href' => $owner['url'],
-					],
-				],
-				'4:link' => [
-					'@attributes' => [
 						'rel'  => 'self',
 						'type' => 'application/activity+json',
 						'href' => $owner['url'],
-					],
-				],
-				'5:link' => [
-					'@attributes' => [
-						'rel'  => ActivityNamespace::HCARD,
-						'type' => 'text/html',
-						'href' => $baseURL . '/hcard/' . $owner['nickname'],
-					],
-				],
-				...($hideAvatar ? [] : ['6:link' => [
-					'@attributes' => [
-						'rel'  => ActivityNamespace::WEBFINGERAVATAR,
-						'type' => $avatar['type'],
-						'href' => User::getAvatarUrl($owner),
-					],
-				]]),
-				'7:link' => [
-					'@attributes' => [
-						'rel'  => ActivityNamespace::DIASPORA_SEED,
-						'type' => 'text/html',
-						'href' => $baseURL,
-					],
-				],
-				'8:link' => [
-					'@attributes' => [
-						'rel'  => 'salmon',
-						'href' => $baseURL . '/receive/users/' . $owner['guid'],
-					],
-				],
-				'9:link' => [
-					'@attributes' => [
-						'rel'      => ActivityNamespace::OSTATUSSUB,
-						'template' => $baseURL . '/contact/follow?url={uri}',
-					],
-				],
-				'10:link' => [
-					'@attributes' => [
-						'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
-						'template' => $baseURL . '/contact/follow?url={object}',
-					],
-				],
-				'11:link' => [
-					'@attributes' => [
-						'rel'      => ActivityNamespace::FEP3B86_CREATE,
-						'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
-					],
-				],
-				'12:link' => [
-					'@attributes' => [
-						'rel'  => ActivityNamespace::OPENWEBAUTH,
-						'type' => 'application/x-zot+json',
-						'href' => $baseURL . '/owa',
 					],
 				],
 			],
