@@ -957,6 +957,7 @@ return [
 			"commented"             => ["post-thread-user", "commented"],
 			"received"              => ["post-thread-user", "received"],
 			"changed"               => ["post-thread-user", "changed"],
+			"event-time"            => ["post-user", "event-time"],
 			"post-type"             => ["post-user", "post-type"],
 			"post-reason"           => ["post-user", "post-reason"],
 			"private"               => ["post-user", "private"],
