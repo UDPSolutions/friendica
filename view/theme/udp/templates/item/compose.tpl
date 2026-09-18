@@ -354,6 +354,7 @@
 
 				{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 				{{if $created_at}}{{$created_at nofilter}}{{/if}}
+				{{$event_time nofilter}}
 				{{else}}
 				<input type="hidden" name="circle_allow" value="{{$circle_allow}}"/>
 				<input type="hidden" name="contact_allow" value="{{$contact_allow}}"/>

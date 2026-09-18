@@ -1450,7 +1450,8 @@ class Transmitter
 			$data['actor'] = $link;
 		}
 
-		$data['published'] = DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM);
+		$published = !empty($item['event-time']) ? $item['event-time'] : $item['created'];
+		$data['published'] = DateTimeFormat::utc($published . '+00:00', DateTimeFormat::ATOM);
 
 		$data['instrument'] = self::getService();
 
