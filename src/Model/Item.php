@@ -106,7 +106,7 @@ class Item
 	// Field list that is used to deliver items via the protocols
 	public const DELIVER_FIELDLIST = [
 		'uid', 'id', 'parent', 'uri-id', 'uri', 'thr-parent', 'parent-uri', 'guid',
-		'parent-guid', 'conversation', 'received', 'created', 'edited', 'verb', 'object-type', 'object', 'target',
+		'parent-guid', 'conversation', 'received', 'created', 'edited', 'event-time', 'verb', 'object-type', 'object', 'target',
 		'private', 'title', 'content-warning', 'body', 'raw-body', 'language', 'location', 'coord', 'app', 'sensitive',
 		'inform', 'deleted', 'extid', 'post-type', 'post-reason', 'gravity',
 		'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
@@ -2570,9 +2570,10 @@ class Item
 			$uid, $wall, $user['register_date'],
 		];
 		$params = ['order' => ['received' => false]];
-		$thread = Post::selectFirstThread(['received'], $condition, $params);
+		$thread = Post::selectFirstThread(['received', 'event-time'], $condition, $params);
 		if (DBA::isResult($thread)) {
-			$postdate = substr(DateTimeFormat::local($thread['received']), 0, 10);
+			$effective = !empty($thread['event-time']) ? $thread['event-time'] : $thread['received'];
+			$postdate  = substr(DateTimeFormat::local($effective), 0, 10);
 			return $postdate;
 		}
 		return false;
