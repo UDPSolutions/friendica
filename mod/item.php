@@ -143,6 +143,9 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 	$post['pubmail']   = $request['pubmail_enable'] ?? false;
 	$post['created']   = $request['created_at']     ?? DateTimeFormat::utcNow();
 	$post['edited']    = $post['changed'] = $post['commented'] = $post['created'];
+	if (!empty($request['event_time'])) {
+		$post['event-time'] = DateTimeFormat::utc($request['event_time']);
+	}
 	$post['app']       = '';
 	$post['inform']    = '';
 	$post['postopts']  = '';

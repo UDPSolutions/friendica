@@ -123,7 +123,7 @@ class Item
 		'id', 'uid', 'parent', 'uri', 'parent-uri', 'thr-parent',
 		'guid', 'uri-id', 'parent-uri-id', 'thr-parent-id', 'conversation', 'vid',
 		'quote-uri', 'quote-uri-id', 'contact-id', 'wall', 'gravity', 'extid', 'psid',
-		'created', 'edited', 'commented', 'received', 'changed', 'verb',
+		'created', 'edited', 'commented', 'received', 'changed', 'event-time', 'verb',
 		'postopts', 'plink', 'resource-id', 'event-id', 'inform',
 		'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'post-type', 'post-reason',
 		'private', 'pubmail', 'visible', 'starred',
