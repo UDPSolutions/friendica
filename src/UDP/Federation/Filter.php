@@ -2,10 +2,8 @@
 
 namespace Friendica\UDP\Federation;
 
-use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Object\Search\ContactResult;
 use Friendica\Object\Search\ResultList;
-use Friendica\Util\HTTPSignature;
 
 /**
  * Applies the UDP allowlist to higher-level objects before any outbound probe
@@ -80,32 +78,22 @@ class Filter
 	}
 
 	/**
-	 * Require a valid HTTP signature from an allowlisted domain on AP fetch endpoints.
-	 * Throws ForbiddenException for unsigned requests or non-allowlisted signers.
-	 * Call this at the top of rawContent() on any AP GET endpoint.
+	 * AP actor/object GET endpoints are fetched unsigned during initial contact
+	 * discovery, so we cannot gate them by HTTP signature without breaking all
+	 * inbound contact lookups. Left as a no-op; the allowlist is enforced on
+	 * outbound delivery (ActivityPub/Delivery.php) and inbound AP activities
+	 * (ActivityPub/Receiver.php) instead.
 	 */
 	public function checkInboundFetch(array $server): void
 	{
-		$signer = HTTPSignature::getSigner('', $server);
-		$domain = $signer ? (parse_url($signer, PHP_URL_HOST) ?? '') : '';
-		$this->gateway->checkInbound($domain);
 	}
 
 	/**
-	 * Gate WebFinger /.well-known/webfinger by allowlist.
-	 * Unsigned or non-allowlisted requests get NotFoundException (404) so the
-	 * user's existence is not confirmed to outside crawlers.
-	 * Safe to call even when gateway is disabled — Gateway::checkInbound() no-ops in that case.
+	 * WebFinger is never HTTP-signed, so we cannot gate it by allowlist without
+	 * breaking all inbound contact lookups. Left as a no-op; discovery protection
+	 * is handled at the Mastodon API search and profile-page layers instead.
 	 */
 	public function checkInboundWebFinger(array $server): void
 	{
-		$signer = HTTPSignature::getSigner('', $server);
-		$domain = $signer ? (parse_url($signer, PHP_URL_HOST) ?? '') : '';
-
-		try {
-			$this->gateway->checkInbound($domain);
-		} catch (\Friendica\Network\HTTPException\ForbiddenException $e) {
-			throw new NotFoundException();
-		}
 	}
 }
