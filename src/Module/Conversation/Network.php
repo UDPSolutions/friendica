@@ -324,11 +324,12 @@ class Network extends Timeline
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader($request);
 		} else {
+			$pagerField = ($this->order === 'created') ? 'effective_created' : $this->order;
 			$pager = new BoundariesPager(
 				$this->l10n,
 				$this->args->getQueryString(),
-				$items[array_key_first($items)][$this->order] ?? null,
-				$items[array_key_last($items)][$this->order]  ?? null,
+				$items[array_key_first($items)][$pagerField] ?? null,
+				$items[array_key_last($items)][$pagerField]  ?? null,
 				$this->itemsPerPage,
 			);
 
@@ -343,7 +344,7 @@ class Network extends Timeline
 		if ($this->order === 'received') {
 			return '`received`';
 		} elseif ($this->order === 'created') {
-			return '`created`';
+			return '`effective_created`';
 		} else {
 			return '`commented`';
 		}
@@ -595,7 +596,7 @@ class Network extends Timeline
 						$commonCondition = DBA::mergeConditions($commonCondition, ["`commented` < ?", $this->maxId]);
 						break;
 					case 'created':
-						$commonCondition = DBA::mergeConditions($commonCondition, ["`created` < ?", $this->maxId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`effective_created` < ?", $this->maxId]);
 						break;
 					case 'uriid':
 						$commonCondition = DBA::mergeConditions($commonCondition, ["`uri-id` < ?", $this->maxId]);
@@ -612,7 +613,7 @@ class Network extends Timeline
 						$commonCondition = DBA::mergeConditions($commonCondition, ["`commented` > ?", $this->minId]);
 						break;
 					case 'created':
-						$commonCondition = DBA::mergeConditions($commonCondition, ["`created` > ?", $this->minId]);
+						$commonCondition = DBA::mergeConditions($commonCondition, ["`effective_created` > ?", $this->minId]);
 						break;
 					case 'uriid':
 						$commonCondition = DBA::mergeConditions($commonCondition, ["`uri-id` > ?", $this->minId]);
@@ -623,13 +624,15 @@ class Network extends Timeline
 
 		$params = ['limit' => $this->itemsPerPage];
 
+		$orderField = ($this->order === 'created') ? 'effective_created' : $this->order;
+
 		if (isset($this->minId) && !isset($this->maxId)) {
 			// min_id quirk: querying in reverse order with min_id gets the most recent rows, regardless of how close
 			// they are to min_id. We change the query ordering to get the expected data, and we need to reverse the
 			// order of the results.
-			$params['order'] = [$this->order => false];
+			$params['order'] = [$orderField => false];
 		} else {
-			$params['order'] = [$this->order => true];
+			$params['order'] = [$orderField => true];
 		}
 
 		$filterchannels = $this->pConfig->get($this->session->getLocalUserId(), 'channel', 'filter_channels') ?? [];
@@ -638,7 +641,7 @@ class Network extends Timeline
 			$commonCondition = DBA::mergeConditions($commonCondition, array_merge([$query], [$this->session->getLocalUserId()], $filterchannels));
 		}
 
-		$fields    = ['uri-id', 'created', 'received', 'commented', 'channel', 'contact-id'];
+		$fields    = ['uri-id', 'created', 'received', 'commented', 'effective_created', 'channel', 'contact-id'];
 		$condition = DBA::mergeConditions($timelineCondition, $commonCondition);
 
 		$timeline = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
