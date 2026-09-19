@@ -2569,12 +2569,21 @@ class Item
 			"`uid` = ? AND `wall` = ? AND NOT `deleted` AND `visible` AND `received` >= ?",
 			$uid, $wall, $user['register_date'],
 		];
-		$params = ['order' => ['received' => false]];
-		$thread = Post::selectFirstThread(['received', 'event-time'], $condition, $params);
-		if (DBA::isResult($thread)) {
-			$effective = !empty($thread['event-time']) ? $thread['event-time'] : $thread['received'];
-			$postdate  = substr(DateTimeFormat::local($effective), 0, 10);
-			return $postdate;
+		$byReceived = Post::selectFirstThread(['received'], $condition, ['order' => ['received' => false]]);
+		$byEvent    = Post::selectFirstThread(['event-time'], $condition, ['order' => ['event-time' => false]]);
+
+		$floor = null;
+		if (DBA::isResult($byReceived)) {
+			$floor = $byReceived['received'];
+		}
+		if (DBA::isResult($byEvent) && !empty($byEvent['event-time'])) {
+			if (is_null($floor) || $byEvent['event-time'] < $floor) {
+				$floor = $byEvent['event-time'];
+			}
+		}
+
+		if ($floor) {
+			return substr(DateTimeFormat::local($floor), 0, 10);
 		}
 		return false;
 	}

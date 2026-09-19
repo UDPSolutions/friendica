@@ -533,10 +533,10 @@ class Network extends Timeline
 		}
 
 		if ($this->dateFrom) {
-			$commonCondition = DBA::mergeConditions($commonCondition, ["COALESCE(`event-time`, `received`) <= ? ", DateTimeFormat::convert($this->dateFrom . ' 23:59:59', 'UTC', $this->appHelper->getTimeZone())]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`effective_created` <= ?", DateTimeFormat::convert($this->dateFrom . ' 23:59:59', 'UTC', $this->appHelper->getTimeZone())]);
 		}
 		if ($this->dateTo) {
-			$commonCondition = DBA::mergeConditions($commonCondition, ["COALESCE(`event-time`, `received`) >= ? ", DateTimeFormat::convert($this->dateTo, 'UTC', $this->appHelper->getTimeZone())]);
+			$commonCondition = DBA::mergeConditions($commonCondition, ["`effective_created` >= ?", DateTimeFormat::convert($this->dateTo, 'UTC', $this->appHelper->getTimeZone())]);
 		}
 
 		if ($this->circleId) {
