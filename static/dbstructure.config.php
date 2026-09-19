@@ -2247,8 +2247,9 @@ return [
 			"actioned_at"        => ["type" => "datetime", "comment" => "When the admin took action"],
 		],
 		"indexes" => [
-			"PRIMARY" => ["id"],
-			"status"  => ["status"],
+			"PRIMARY"      => ["id"],
+			"status"       => ["status"],
+			"reviewer_uid" => ["reviewer_uid"],
 		],
 	],
 	"worker-ipc" => [
