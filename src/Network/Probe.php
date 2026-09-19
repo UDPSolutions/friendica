@@ -278,10 +278,7 @@ class Probe
 			$data['gsid'] = GServer::getRealID($data['baseurl']);
 		}
 
-		// Ensure that local connections always are DFRN
-		if (($network == '') && ($data['network'] != Protocol::PHANTOM) && (self::ownHost($data['baseurl'] ?? '') || self::ownHost($data['url']))) {
-			$data['network'] = Protocol::DFRN;
-		}
+		// UDP: local connections use AP, not DFRN
 
 		if (!isset($data['hide']) && in_array($data['network'], Protocol::FEDERATED)) {
 			$data['hide'] = self::getHideStatus($data['url']);
@@ -586,9 +583,7 @@ class Probe
 
 		$result = [];
 
-		if (in_array($network, ['', Protocol::DFRN])) {
-			$result = self::dfrn($webfinger);
-		}
+		// UDP: DFRN probe removed — all federation via AP
 		if ((!$result && ($network == '')) || ($network == Protocol::DIASPORA)) {
 			$result = self::diaspora($webfinger);
 		} else {
