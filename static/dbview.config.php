@@ -763,6 +763,7 @@ return [
 			"commented"             => ["post-thread", "commented"],
 			"received"              => ["post-user", "received"],
 			"changed"               => ["post-thread", "changed"],
+			"event-time"            => ["post-user", "event-time"],
 			"post-type"             => ["post-user", "post-type"],
 			"post-reason"           => ["post-user", "post-reason"],
 			"private"               => ["post-user", "private"],
