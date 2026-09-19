@@ -106,7 +106,7 @@ class Item
 	// Field list that is used to deliver items via the protocols
 	public const DELIVER_FIELDLIST = [
 		'uid', 'id', 'parent', 'uri-id', 'uri', 'thr-parent', 'parent-uri', 'guid',
-		'parent-guid', 'conversation', 'received', 'created', 'edited', 'event-time', 'verb', 'object-type', 'object', 'target',
+		'parent-guid', 'conversation', 'received', 'created', 'edited', 'verb', 'object-type', 'object', 'target',
 		'private', 'title', 'content-warning', 'body', 'raw-body', 'language', 'location', 'coord', 'app', 'sensitive',
 		'inform', 'deleted', 'extid', 'post-type', 'post-reason', 'gravity',
 		'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
