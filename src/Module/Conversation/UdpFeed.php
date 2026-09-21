@@ -93,7 +93,10 @@ class UdpFeed extends Network
 			"`uri-id` NOT IN (SELECT `uri-id` FROM `udp-group-post`)",
 		]);
 
-		// Apply the same cursor constraints the network feed uses for pagination
+		// Apply the same cursor constraints the network feed uses for pagination.
+		// Use 'received' as the sort/cursor field for community items (origin posts
+		// don't go through the network-thread-view so 'commented' is unavailable there;
+		// 'received' == 'created' == 'commented' for wall-origin posts anyway).
 		if (isset($this->maxId)) {
 			$condition = DBA::mergeConditions($condition, ["`received` < ?", $this->maxId]);
 		}
@@ -101,18 +104,26 @@ class UdpFeed extends Network
 			$condition = DBA::mergeConditions($condition, ["`received` > ?", $this->minId]);
 		}
 
+		// post-thread-origin-view exposes 'received', 'created', 'commented' but not
+		// 'effective_created'.  For origin posts received==created==commented so we
+		// synthesise the missing fields after fetching.
 		$params = ['order' => ['received' => true], 'limit' => $savedLimit * 2];
-		$result = Post::selectOriginThread(['uri-id', 'received'], $condition, $params);
+		$result = Post::selectOriginThread(['uri-id', 'received', 'commented', 'created'], $condition, $params);
 		while ($row = $this->database->fetch($result)) {
 			if (!isset($merged[$row['uri-id']])) {
+				// Synthesise effective_created so Network::content()'s pager field lookup
+				// never returns null for community-only rows.
+				$row['effective_created'] = $row['created'];
 				$merged[$row['uri-id']] = $row;
 			}
 		}
 		$this->database->close($result);
 
-		// Unified sort: newest first, trimmed to one page
+		// Unified sort: newest first by received timestamp, preserving uri-id keys.
 		uasort($merged, fn($a, $b) => strcmp($b['received'] ?? '', $a['received'] ?? ''));
 
-		return array_slice(array_values($merged), 0, $savedLimit);
+		// Trim to one page while keeping uri-id as the array key (BoundariesPager uses
+		// array_key_first/last to find the first and last item, not numeric offsets).
+		return array_slice($merged, 0, $savedLimit, true);
 	}
 }
