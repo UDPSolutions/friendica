@@ -3129,11 +3129,6 @@ class Contact
 		// remove ajax junk, e.g. Twitter
 		$url = str_replace('/#!/', '/', $url);
 
-		if (!Network::isUrlAllowed($url)) {
-			$result['message'] = DI::l10n()->t('Disallowed profile URL.');
-			return $result;
-		}
-
 		if (Network::isUrlBlocked($url)) {
 			$result['message'] = DI::l10n()->t('Blocked domain');
 			return $result;
@@ -3168,6 +3163,12 @@ class Contact
 			if ($ret['network'] != Protocol::PHANTOM) {
 				self::getIdForURL($url);
 			}
+		}
+
+		// RSS feeds are always permitted regardless of allowed_sites; all other protocols respect the walled-garden setting.
+		if ($ret['network'] !== Protocol::FEED && !Network::isUrlAllowed($url)) {
+			$result['message'] = DI::l10n()->t('Disallowed profile URL.');
+			return $result;
 		}
 
 		if (($network != '') && ($ret['network'] != $network)) {

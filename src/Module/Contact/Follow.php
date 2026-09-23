@@ -214,17 +214,17 @@ class Follow extends BaseModule
 
 		$targetDomain = parse_url($url, PHP_URL_HOST) ?? '';
 		$cachedContact = Contact::getByURL($url, false);
-		$cachedProtocol = !empty($cachedContact)
-			? Contact::getProtocol($cachedContact['url'], $cachedContact['network'])
-			: Protocol::ACTIVITYPUB;
-		if (!empty($targetDomain)
-			&& in_array($cachedProtocol, [Protocol::ACTIVITYPUB, Protocol::DFRN])
-			&& !DI::federationGateway()->isAllowedOutbound($targetDomain)
-		) {
-			$this->sysMessages->addNotice($this->t(
-				'This server isn\'t connected to your network. Ask your admin to add it.'
-			));
-			$this->baseUrl->redirect($returnPath);
+		if (!empty($cachedContact)) {
+			$cachedProtocol = Contact::getProtocol($cachedContact['url'], $cachedContact['network']);
+			if (!empty($targetDomain)
+				&& in_array($cachedProtocol, [Protocol::ACTIVITYPUB, Protocol::DFRN])
+				&& !DI::federationGateway()->isAllowedOutbound($targetDomain)
+			) {
+				$this->sysMessages->addNotice($this->t(
+					'This server isn\'t connected to your network. Ask your admin to add it.'
+				));
+				$this->baseUrl->redirect($returnPath);
+			}
 		}
 
 		$result = Contact::createFromProbeForUser($this->session->getLocalUserId(), $url);
