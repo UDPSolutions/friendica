@@ -2216,6 +2216,23 @@ return [
 			"uid_album" => ["uid", "album(64)"],
 		],
 	],
+	"udp_context_fence" => [
+		"comment" => "UDP Social context fences — node pairs whose content should not be relayed between each other",
+		"fields" => [
+			"id"        => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
+			"uid"       => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "foreign" => ["user" => "uid"], "comment" => "Local user who owns this fence rule"],
+			"contact_a" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => "Contact id of person A"],
+			"node_a"    => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Home node of person A"],
+			"contact_c" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => "Contact id of person C"],
+			"node_c"    => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Home node of person C"],
+			"created"   => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+		],
+		"indexes" => [
+			"PRIMARY"          => ["id"],
+			"uid"              => ["uid"],
+			"uid_contact_pair" => ["UNIQUE", "uid", "contact_a", "contact_c"],
+		],
+	],
 	"udp_allowlist" => [
 		"comment" => "UDP Social federation allowlist — domains permitted to send/receive AP traffic with this slot",
 		"fields" => [
