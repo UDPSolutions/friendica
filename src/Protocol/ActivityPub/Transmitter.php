@@ -1095,10 +1095,20 @@ class Transmitter
 
 				if ($item_profile && ($receiver == $item_profile['followers']) && ($uid == $profile_uid)) {
 					$gateway = DI::federationGateway();
+					$fence   = DI::contextFence();
 					$followerInboxes = self::fetchTargetInboxesforUser($uid);
 					$followerInboxes = array_filter(
 						$followerInboxes,
-						fn(string $inbox) => $gateway->isAllowedOutbound(parse_url($inbox, PHP_URL_HOST) ?? ''),
+						function (string $inbox) use ($gateway, $fence, $uid, $item): bool {
+							$host = parse_url($inbox, PHP_URL_HOST) ?? '';
+							if (!$gateway->isAllowedOutbound($host)) {
+								return false;
+							}
+							if (!empty($item['uri-id']) && $fence->isAncestorFenced($uid, (int)$item['uri-id'], $host)) {
+								return false;
+							}
+							return true;
+						},
 						ARRAY_FILTER_USE_KEY
 					);
 					$inboxes = array_merge_recursive($inboxes, $followerInboxes);
@@ -1113,7 +1123,8 @@ class Transmitter
 							$target = $profile['sharedinbox'];
 						}
 						$targetDomain = parse_url($target, PHP_URL_HOST) ?? '';
-						if (!self::archivedInbox($target) && !in_array($contact['id'], $inboxes[$target] ?? []) && DI::federationGateway()->isAllowedOutbound($targetDomain)) {
+						$fenced = !empty($item['uri-id']) && DI::contextFence()->isAncestorFenced($uid, (int)$item['uri-id'], $targetDomain);
+						if (!self::archivedInbox($target) && !in_array($contact['id'], $inboxes[$target] ?? []) && DI::federationGateway()->isAllowedOutbound($targetDomain) && !$fenced) {
 							$inboxes[$target][] = $contact['id'] ?? 0;
 						}
 					}
