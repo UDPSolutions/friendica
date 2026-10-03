@@ -2230,6 +2230,8 @@ return [
 		"indexes" => [
 			"PRIMARY"          => ["id"],
 			"uid"              => ["uid"],
+			"contact_a"        => ["contact_a"],
+			"contact_c"        => ["contact_c"],
 			"uid_contact_pair" => ["UNIQUE", "uid", "contact_a", "contact_c"],
 		],
 	],
