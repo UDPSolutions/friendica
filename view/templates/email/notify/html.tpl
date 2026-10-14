@@ -4,53 +4,63 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<table>
-	<thead>
-		<tr>
-			<td colspan="2" style="padding-top:22px;">
-				{{$preamble nofilter}}
-			</td>
-		</tr>
-	</thead>
-{{if $content_allowed}}
-	<tbody>
-	{{if $source_photo}}
-		<tr>
-			<td style="padding-left:22px;padding-top:22px;width:60px;" valign="top" rowspan=3><a href="{{$source_link}}"><img style="border:0px;width:48px;height:48px;" src="{{$source_photo}}"></a></td>
-			<td style="padding-top:22px;"><a href="{{$source_link}}">{{$source_name}}</a></td>
-		</tr>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+
+	{{if $preamble}}
+	<tr>
+		<td style="padding-bottom:20px; color:#1a1a1a; font-size:15px; line-height:1.65;">{{$preamble nofilter}}</td>
+	</tr>
 	{{/if}}
-		<tr>
-			<td style="font-weight:bold;padding-bottom:5px;">{{$title}}</td>
-		</tr>
-		<tr>
-			<td style="padding-right:22px;">{{$htmlversion nofilter}}
+
+	{{if $content_allowed}}
+	<tr>
+		<td>
+			<!-- Notification card -->
+			<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9f9f9; border-radius:6px; border-left:3px solid #084769;">
+			<tr>
+				{{if $source_photo}}
+				<td style="padding:16px 0 16px 16px; width:52px; vertical-align:top;">
+					<a href="{{$source_link}}" style="text-decoration:none;">
+						<img src="{{$source_photo}}" width="40" height="40" style="border-radius:50%; border:0; display:block;" alt="" />
+					</a>
+				</td>
+				{{/if}}
+				<td style="padding:16px; vertical-align:top;">
+					{{if $source_name}}
+					<div style="margin-bottom:6px;">
+						<a href="{{$source_link}}" style="color:#084769; font-weight:600; font-size:14px; text-decoration:none;">{{$source_name}}</a>
+					</div>
+					{{/if}}
+					{{if $title}}
+					<div style="font-weight:600; font-size:15px; color:#1a1a1a; margin-bottom:8px;">{{$title}}</div>
+					{{/if}}
+					<div style="color:#333333; font-size:14px; line-height:1.6;">{{$htmlversion nofilter}}</div>
+				</td>
+			</tr>
+			</table>
 		</td>
-		</tr>
-{{/if}}
-	</tbody>
-	<tfoot>
-		<tr>
-			<td colspan="2" style="padding-top:11px;">
-				{{$hsitelink nofilter}}
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" style="padding-bottom:11px;">
-				{{$hitemlink nofilter}}
-			</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>
-				{{$thanks}}
-			</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>
-				{{$site_admin}}
-			</td>
-		</tr>
-	</tfoot>
+	</tr>
+	{{/if}}
+
+	{{if $hsitelink}}
+	<tr>
+		<td style="padding-top:20px; font-size:13px; color:#777777;">{{$hsitelink nofilter}}</td>
+	</tr>
+	{{/if}}
+	{{if $hitemlink}}
+	<tr>
+		<td style="padding-top:4px; font-size:13px; color:#777777;">{{$hitemlink nofilter}}</td>
+	</tr>
+	{{/if}}
+	{{if $thanks}}
+	<tr>
+		<td style="padding-top:16px; color:#555555; font-size:14px;">{{$thanks}}</td>
+	</tr>
+	{{/if}}
+	{{if $site_admin}}
+	<tr>
+		<td style="color:#555555; font-size:14px;">{{$site_admin}}</td>
+	</tr>
+	{{/if}}
+
 </table>
