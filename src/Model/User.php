@@ -1726,6 +1726,14 @@ class User
 	 */
 	public static function sendRegisterOpenEmail(L10n $l10n, array $user, string $sitename, string $siteurl, string $password)
 	{
+		$magic_token = Strings::getRandomHex(32);
+		DBA::update('user', [
+			'pwdreset'      => hash('sha256', $magic_token),
+			'pwdreset_time' => DateTimeFormat::utcNow(),
+		], ['uid' => $user['uid']]);
+
+		$loginlink = $siteurl . '/login/magic/' . $magic_token;
+
 		$preamble = Strings::deindent($l10n->t(
 			'
 				Hi %1$s,
@@ -1737,25 +1745,20 @@ class User
 		));
 		$body = Strings::deindent($l10n->t(
 			'
-			Your login details:
+			Click the link below to log in. The link expires in 1 hour.
 
-			  Site:      %3$s
-			  Username:  %1$s
-			  Password:  %5$s
+			  %1$s
 
-			Once you\'re in:
+			Your username: %2$s
 
-			  · Change your password from Settings → Account.
-			  · Add a profile photo so your community recognizes you.
-			  · Browse Contacts to find people you know.
+			Once you\'re in, set a password and optionally enable two-factor
+			authentication from Settings → Account.
 
 			To delete your account at any time:
 			%3$s/settings/removeme',
+			$loginlink,
 			$user['nickname'],
-			$sitename,
 			$siteurl,
-			$user['username'],
-			$password,
 		));
 
 		$email = DI::emailer()
