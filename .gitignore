@@ -12,6 +12,7 @@ favicon.*
 home.html
 *~
 robots.txt
+logos/*
 
 #ignore local config
 !/config/local-sample.config.php
