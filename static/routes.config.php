@@ -348,7 +348,8 @@ return [
 
 		'/tos' => [Module\Admin\Tos::class, [R::GET, R::POST]],
 
-		'/node-pair[/{action}]'          => [Module\Admin\NodePair::class,   [R::GET, R::POST]], // UDP: node pairing UI
+		'/node-pair[/{action}]'          => [Module\Admin\NodePair::class,    [R::GET, R::POST]], // UDP: node pairing UI
+		'/node-metrics'                  => [Module\Admin\NodeMetrics::class, [R::GET]],          // UDP: node health metrics
 		'/takedown[/{action}[/{id:\d+}]]' => [Module\Admin\Takedown::class,  [R::GET, R::POST]], // UDP: takedown requests
 	],
 	'/amcd'              => [Module\AccountManagementControlDocument::class, [R::GET]],

@@ -74,7 +74,8 @@ abstract class BaseAdmin extends BaseModule
 			'configuration' => [DI::l10n()->t('Configuration'), [
 				'site'      => ['admin/site'        , DI::l10n()->t('Site')                    , 'site'],
 				'tos'       => ['admin/tos'         , DI::l10n()->t('Terms of Service')        , 'tos'],
-				'node-pair' => ['admin/node-pair'   , DI::l10n()->t('Node Pairing')            , 'node-pair'],
+				'node-pair'    => ['admin/node-pair'    , DI::l10n()->t('Node Pairing')  , 'node-pair'],
+				'node-metrics' => ['admin/node-metrics' , DI::l10n()->t('Node Metrics')  , 'node-metrics'],
 			]],
 			'legal' => [DI::l10n()->t('Legal'), [
 				'takedown' => ['admin/takedown', DI::l10n()->t('Takedown Requests'), 'takedown'],

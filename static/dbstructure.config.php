@@ -2249,6 +2249,46 @@ return [
 			"slot_allowed_domain"  => ["UNIQUE", "slot_domain", "allowed_domain"],
 		],
 	],
+	"udp_storage_usage" => [
+		"comment" => "UDP Social — running R2 byte totals per slot, updated on every upload/delete",
+		"fields" => [
+			"slot_domain" => ["type" => "varchar(255)", "not null" => "1", "primary" => "1", "comment" => "Slot hostname, e.g. donahues.udp.social"],
+			"r2_bytes"    => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Accumulated R2 bytes for user uploads"],
+			"updated_at"  => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Last write time"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["slot_domain"],
+		],
+	],
+	"udp_r2_object_sizes" => [
+		"comment" => "UDP Social — per-object R2 size ledger; written on upload, read+removed on delete",
+		"fields" => [
+			"reference"   => ["type" => "varchar(64)", "not null" => "1", "primary" => "1", "comment" => "Friendica storage reference (hex)"],
+			"size_bytes"  => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Object size at upload time"],
+			"created_at"  => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+		],
+		"indexes" => [
+			"PRIMARY" => ["reference"],
+		],
+	],
+	"udp_node_metrics" => [
+		"comment" => "UDP Social — time-series node health metrics; raw 10-min, rolled into 1h and 24h bins",
+		"fields" => [
+			"id"               => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
+			"slot_domain"      => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Slot hostname"],
+			"collected_at"     => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Bucket timestamp (start of window)"],
+			"bin_size"         => ["type" => "varchar(8)", "not null" => "1", "default" => "10min", "comment" => "10min | 1hour | 24hour"],
+			"queue_depth"      => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "Pending WQ jobs at collection time"],
+			"disk_local_used"  => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Container filesystem bytes used"],
+			"disk_local_quota" => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Per-slot local disk allocation in bytes"],
+			"last_post_at"     => ["type" => "datetime", "comment" => "created timestamp of most recent local post at collection time"],
+		],
+		"indexes" => [
+			"PRIMARY"              => ["id"],
+			"slot_collected"       => ["slot_domain", "collected_at"],
+			"slot_bin_collected"   => ["UNIQUE", "slot_domain", "bin_size", "collected_at"],
+		],
+	],
 	"udp_takedown" => [
 		"comment" => "UDP Social DMCA and content takedown requests",
 		"fields" => [
