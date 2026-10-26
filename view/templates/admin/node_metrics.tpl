@@ -18,7 +18,7 @@
 <div class="row" style="margin-bottom:1.5em">
 
 	{{* Queue depth *}}
-	<div class="col-sm-4">
+	<div class="col-sm-3">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4 class="panel-title">Worker Queue</h4></div>
 			<div class="panel-body text-center">
@@ -32,25 +32,18 @@
 	</div>
 
 	{{* Local disk *}}
-	<div class="col-sm-4">
+	<div class="col-sm-3">
 		<div class="panel panel-default">
-			<div class="panel-heading"><h4 class="panel-title">Local Disk (cache)</h4></div>
-			<div class="panel-body">
-				<div class="progress" title="{{$disk_pct}}%">
-					<div class="progress-bar {{if $disk_pct > 85}}progress-bar-danger{{elseif $disk_pct > 65}}progress-bar-warning{{else}}progress-bar-success{{/if}}"
-					     style="width:{{$disk_pct}}%; min-width:2em">
-						{{$disk_pct}}%
-					</div>
-				</div>
-				<div class="text-muted text-center" style="font-size:.85em">
-					{{$disk_used_fmt}} / {{$disk_quota_fmt}}
-				</div>
+			<div class="panel-heading"><h4 class="panel-title">Local Disk (DB + files)</h4></div>
+			<div class="panel-body text-center">
+				<span style="font-size:2em; font-weight:bold">{{$disk_used_fmt}}</span>
+				<div class="text-muted" style="font-size:.85em">DB + html directory</div>
 			</div>
 		</div>
 	</div>
 
 	{{* R2 storage *}}
-	<div class="col-sm-4">
+	<div class="col-sm-3">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4 class="panel-title">R2 Storage (uploads)</h4></div>
 			<div class="panel-body">
@@ -68,6 +61,23 @@
 		</div>
 	</div>
 
+	{{* Worker activity *}}
+	<div class="col-sm-3">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4 class="panel-title">Worker Activity</h4></div>
+			<div class="panel-body text-center">
+				<table class="table table-condensed" style="margin:0">
+					<tbody>
+						<tr><td class="text-muted text-right" style="font-size:.85em">24 h</td><td style="font-weight:bold">{{$jobs_1d}}</td></tr>
+						<tr><td class="text-muted text-right" style="font-size:.85em">7 d</td><td style="font-weight:bold">{{$jobs_7d}}</td></tr>
+						<tr><td class="text-muted text-right" style="font-size:.85em">30 d</td><td style="font-weight:bold">{{$jobs_30d}}</td></tr>
+					</tbody>
+				</table>
+				<div class="text-muted" style="font-size:.8em; margin-top:.25em">jobs dispatched</div>
+			</div>
+		</div>
+	</div>
+
 </div>{{* /row *}}
 
 {{* ── HISTORY TABLE ────────────────────────────────────────────────────── *}}
@@ -79,6 +89,7 @@
 			<th>Time</th>
 			<th>Bin</th>
 			<th>Queue depth</th>
+			<th>Jobs dispatched</th>
 			<th>Local disk used</th>
 		</tr>
 	</thead>
@@ -88,6 +99,7 @@
 		<td><small>{{$row.collected_at}}</small></td>
 		<td><span class="label label-default">{{$row.bin_size}}</span></td>
 		<td>{{$row.queue_depth}}</td>
+		<td>{{$row.jobs_dispatched}}</td>
 		<td><small>{{$row.disk_local_used_fmt}}</small></td>
 	</tr>
 	{{/foreach}}

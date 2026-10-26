@@ -2279,8 +2279,9 @@ return [
 			"collected_at"     => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Bucket timestamp (start of window)"],
 			"bin_size"         => ["type" => "varchar(8)", "not null" => "1", "default" => "10min", "comment" => "10min | 1hour | 24hour"],
 			"queue_depth"      => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "Pending WQ jobs at collection time"],
-			"disk_local_used"  => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Container filesystem bytes used"],
-			"disk_local_quota" => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Per-slot local disk allocation in bytes"],
+			"disk_local_used"  => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Per-slot DB + html dir bytes used"],
+			"disk_local_quota" => ["type" => "bigint unsigned", "not null" => "1", "default" => "0", "comment" => "Reserved; always 0 until per-slot quotas are enforced"],
+			"jobs_dispatched"  => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "Worker dispatches fired in this collection window"],
 			"last_post_at"     => ["type" => "datetime", "comment" => "created timestamp of most recent local post at collection time"],
 		],
 		"indexes" => [

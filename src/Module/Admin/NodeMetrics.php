@@ -42,11 +42,28 @@ class NodeMetrics extends BaseAdmin
 		$r2_bytes  = $r2_row ? (int) $r2_row['r2_bytes']  : 0;
 		$r2_updated = $r2_row ? $r2_row['updated_at'] : null;
 
+		// ── Rolling job dispatch totals ──────────────────────────────────────
+		$jobs_1d  = (int) DBA::fetchFirst(
+			"SELECT COALESCE(SUM(jobs_dispatched), 0) FROM `udp_node_metrics`
+			 WHERE slot_domain = ? AND collected_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 DAY)",
+			$slot_domain
+		);
+		$jobs_7d  = (int) DBA::fetchFirst(
+			"SELECT COALESCE(SUM(jobs_dispatched), 0) FROM `udp_node_metrics`
+			 WHERE slot_domain = ? AND collected_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)",
+			$slot_domain
+		);
+		$jobs_30d = (int) DBA::fetchFirst(
+			"SELECT COALESCE(SUM(jobs_dispatched), 0) FROM `udp_node_metrics`
+			 WHERE slot_domain = ? AND collected_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)",
+			$slot_domain
+		);
+
 		// ── 30-day history (one row per bin) ────────────────────────────────
 		$since = date('Y-m-d H:i:s', strtotime('-30 days'));
 		$raw_history = DBA::selectToArray(
 			'udp_node_metrics',
-			['collected_at', 'bin_size', 'queue_depth', 'disk_local_used'],
+			['collected_at', 'bin_size', 'queue_depth', 'disk_local_used', 'jobs_dispatched'],
 			["`slot_domain` = ? AND `collected_at` >= ?", $slot_domain, $since],
 			['order' => ['collected_at' => false]]
 		);
@@ -70,14 +87,14 @@ class NodeMetrics extends BaseAdmin
 			'$r2_quota_fmt'      => self::fmtBytes($r2_quota_bytes),
 			'$r2_pct'            => $r2_quota_bytes > 0 ? round($r2_bytes / $r2_quota_bytes * 100, 1) : 0,
 			'$r2_updated'        => $r2_updated,
-			'$disk_used_fmt'     => $latest ? self::fmtBytes((int) $latest['disk_local_used'])  : '—',
-			'$disk_quota_fmt'    => $latest ? self::fmtBytes((int) $latest['disk_local_quota']) : '—',
-			'$disk_pct'          => $latest && $latest['disk_local_quota'] > 0
-				? round($latest['disk_local_used'] / $latest['disk_local_quota'] * 100, 1)
-				: 0,
+			'$disk_used_fmt'     => $latest ? self::fmtBytes((int) $latest['disk_local_used']) : '—',
+			'$disk_pct'          => 0,
 			'$queue_depth'       => $latest ? (int) $latest['queue_depth'] : '—',
 			'$last_post_at'      => $latest ? $latest['last_post_at'] : null,
 			'$collected_at'      => $latest ? $latest['collected_at'] : null,
+			'$jobs_1d'           => $jobs_1d,
+			'$jobs_7d'           => $jobs_7d,
+			'$jobs_30d'          => $jobs_30d,
 			'$baseurl'           => (string) DI::baseUrl(),
 		]);
 	}
