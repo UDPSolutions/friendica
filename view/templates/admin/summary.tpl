@@ -35,6 +35,12 @@
 	</dl>
 
 	<dl>
+		<dt>UDP Version</dt>
+		<dd>v1.1{{if $udp_build_hash}} <code>{{$udp_build_hash}}</code>{{/if}}
+		{{if $udp_db_version}} &mdash; DB schema <strong>{{$udp_db_version}}</strong>{{/if}}</dd>
+	</dl>
+
+	<dl>
 		<dt>{{$serversettings.label}}</dt>
 		<dd>
 			<table>

@@ -201,6 +201,10 @@ class Summary extends BaseAdmin
 			];
 		}
 
+		// UDP build hash: read the .build-hash file written by provision_box.yml
+		$buildHashFile = $basePath . '/view/theme/udp/.build-hash';
+		$udpBuildHash  = is_readable($buildHashFile) ? trim((string)file_get_contents($buildHashFile)) : '';
+
 		$t = Renderer::getMarkupTemplate('admin/summary.tpl');
 		return Renderer::replaceMacros($t, [
 			'$title'              => DI::l10n()->t('Administration'),
@@ -210,6 +214,8 @@ class Summary extends BaseAdmin
 			'$platform'           => App::PLATFORM,
 			'$codename'           => App::CODENAME,
 			'$build'              => DI::config()->get('system', 'build'),
+			'$udp_build_hash'     => $udpBuildHash,
+			'$udp_db_version'     => (int) DI::config()->get('udp', 'db_version', 0),
 			'$addons'             => [DI::l10n()->t('Active addons'), $addons],
 			'$serversettings'     => $server_settings,
 			'$warningtext'        => $warningtext,
