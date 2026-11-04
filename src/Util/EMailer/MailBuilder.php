@@ -240,19 +240,26 @@ abstract class MailBuilder
 		$msgHtml = $this->getHtmlMessage() ?? '';
 
 		if (!$raw) {
-			// load the template for private message notifications
-			$tpl     = Renderer::getMarkupTemplate('email/html.tpl');
-			$msgHtml = Renderer::replaceMacros($tpl, [
-				'$title'       => $this->config->get('system', 'network_name', 'Friendica') . ' ' . $this->l10n->t('Notification'),
-				'$product'     => App::PLATFORM,
-				'$htmlversion' => $msgHtml,
-				'$sitename'    => $this->config->get('config', 'sitename'),
-				'$banner'      => $this->config->get(
-					'system',
-					'email_banner',
-					$this->baseUrl . DIRECTORY_SEPARATOR . self::DEFAULT_EMAIL_BANNER,
-				),
-			]);
+			// UDP-HARNESS: Smarty unavailable in CLI bootstrap; skip HTML wrapper.
+			// Remove this try/catch before prod deploy.
+			try {
+				$tpl = Renderer::getMarkupTemplate('email/html.tpl');
+			} catch (\Throwable $e) {
+				$tpl = null;
+			}
+			if ($tpl !== null) {
+				$msgHtml = Renderer::replaceMacros($tpl, [
+					'$title'       => $this->config->get('system', 'network_name', 'Friendica') . ' ' . $this->l10n->t('Notification'),
+					'$product'     => App::PLATFORM,
+					'$htmlversion' => $msgHtml,
+					'$sitename'    => $this->config->get('config', 'sitename'),
+					'$banner'      => $this->config->get(
+						'system',
+						'email_banner',
+						$this->baseUrl . DIRECTORY_SEPARATOR . self::DEFAULT_EMAIL_BANNER,
+					),
+				]);
+			}
 		}
 
 		return new Email(

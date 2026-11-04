@@ -80,8 +80,13 @@ class SystemMailBuilder extends MailBuilder
 	 */
 	protected function getHtmlMessage()
 	{
-		// load the template for private message notifications
-		$tpl = Renderer::getMarkupTemplate('email/system/html.tpl');
+		// UDP-HARNESS: Smarty is unavailable in CLI bootstrap; fall back to null so
+		// MailBuilder::build() sends plaintext-only. Remove this try/catch before prod deploy.
+		try {
+			$tpl = Renderer::getMarkupTemplate('email/system/html.tpl');
+		} catch (\Throwable $e) {
+			return null;
+		}
 		return Renderer::replaceMacros($tpl, [
 			'$preamble'    => str_replace("\n", "<br>\n", $this->preamble),
 			'$thanks'      => $this->l10n->t('thanks'),
@@ -97,8 +102,13 @@ class SystemMailBuilder extends MailBuilder
 	 */
 	protected function getPlaintextMessage()
 	{
-		// load the template for private message notifications
-		$tpl = Renderer::getMarkupTemplate('email/system/text.tpl');
+		// UDP-HARNESS: Smarty unavailable in CLI bootstrap; return raw plaintext.
+		// Remove this try/catch before prod deploy.
+		try {
+			$tpl = Renderer::getMarkupTemplate('email/system/text.tpl');
+		} catch (\Throwable $e) {
+			return $this->preamble . "\n\n" . BBCode::toPlaintext($this->body);
+		}
 		return Renderer::replaceMacros($tpl, [
 			'$preamble'    => $this->preamble,
 			'$thanks'      => $this->l10n->t('thanks'),
