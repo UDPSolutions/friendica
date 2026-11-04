@@ -12,6 +12,7 @@ use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Security\Authentication;
 use Friendica\Util\DateTimeFormat;
@@ -58,7 +59,7 @@ final class MagicLogin extends BaseModule
 		$user = DBA::selectFirst(
 			'user',
 			['uid', 'username', 'nickname', 'email', 'theme', 'password', 'prvkey',
-			 'timezone', 'register_date', 'login_date', 'page-flags', 'pwdreset_time', 'language'],
+			 'timezone', 'register_date', 'page-flags', 'pwdreset_time', 'language'],
 			['pwdreset' => hash('sha256', $token), 'verified' => true, 'blocked' => false,
 			 'account_removed' => false, 'account_expired' => false]
 		);
@@ -77,17 +78,12 @@ final class MagicLogin extends BaseModule
 		// Clear the token — it is single-use
 		DBA::update('user', ['pwdreset' => null, 'pwdreset_time' => null], ['uid' => $user['uid']]);
 
-		$isFirstLogin = ($user['login_date'] <= DBA::NULL_DATETIME);
+		// Pass $interactive=false to suppress Friendica's built-in first-login redirect
+		// to settings/profile/photo/new — we handle the post-magic-link redirect ourselves.
+		$this->auth->setForUser($user, true, false);
 
-		// setForUser handles 2FA redirect and the "new member" welcome redirect internally.
-		// We only add the password nudge for first-time logins where no redirect fires from 2FA.
-		$this->auth->setForUser($user, true, true);
-
-		if ($isFirstLogin) {
-			$this->sysMessages->addInfo($this->l10n->t('Welcome! Set a password below — and consider enabling two-factor authentication for extra security.'));
-			$this->baseUrl->redirect('settings/account');
-		}
-
-		$this->baseUrl->redirect();
+		// Flag the session and send the user to the first-login setup page.
+		DI::session()->set('magic_login', true);
+		$this->baseUrl->redirect('firstlogin');
 	}
 }
