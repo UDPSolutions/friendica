@@ -487,6 +487,7 @@ return [
 	'/logout'                => [Module\Security\Logout::class, [R::GET, R::POST]],
 	'/lostpass[/{token}]'    => [Module\LostPass::class, [R::GET, R::POST]],
 	'/login/magic/{token}'   => [Module\Security\MagicLogin::class, [R::GET]],
+	'/firstlogin'            => [Module\Security\FirstLogin::class, [R::GET, R::POST]],
 	'/magic'                 => [Module\Magic::class,           [R::GET]],
 	'/manifest'              => [Module\Manifest::class,        [R::GET]],
 	'/manifest.json'         => [Module\Manifest::class,        [R::GET]],
