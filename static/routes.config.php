@@ -465,6 +465,7 @@ return [
 	'/hcard/{profile}[/{action}]' => [Module\HCard::class,             [R::GET]],
 	'/inbox[/{nickname}]'         => [Module\ActivityPub\Inbox::class, [R::GET, R::POST]],
 	'/invite'                     => [Module\Udp\MemberInvite::class,  [R::GET, R::POST]], // UDP: replaced with admin-approval invite flow
+	'/join'                       => [Module\Udp\JoinEvent::class,    [R::GET, R::POST]], // UDP: event self-registration (token-gated, QR code)
 
 	'/install' => [
 		'[/]'          => [Module\Install::class, [R::GET, R::POST]],
