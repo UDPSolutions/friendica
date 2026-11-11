@@ -87,6 +87,95 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 HTML;
 
+	// Trial banner / suspension overlay
+	// trial.php is mounted read-only into the container by deploy_slot.yml.
+	// It defines UDP_TRIAL_EXPIRES_AT as a Unix timestamp, or nothing for paid slots.
+	$_udp_trial_config = rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/') . '/config/trial.php';
+	if (is_readable($_udp_trial_config)) {
+		require_once $_udp_trial_config;
+	}
+	if (defined('UDP_TRIAL_EXPIRES_AT') && UDP_TRIAL_EXPIRES_AT > 0) {
+		$_udp_now        = time();
+		$_udp_expires    = UDP_TRIAL_EXPIRES_AT;
+		$_udp_days_left  = max(0, (int) ceil(($_udp_expires - $_udp_now) / 86400));
+		$_udp_trial_over = $_udp_now >= $_udp_expires;
+		$_udp_plan_url   = htmlspecialchars('https://blog.udp.social/busybees/', ENT_QUOTES, 'UTF-8');
+
+		if ($_udp_trial_over) {
+			// Full-screen blocking overlay injected via script so it lands in <body>.
+			DI::page()['htmlhead'] .= <<<HTML
+<style>
+#udp-trial-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;
+  justify-content:center;background:rgba(0,0,0,.78)}
+#udp-trial-gate-panel{background:#fff;border-radius:12px;padding:40px 36px;
+  max-width:460px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.3)}
+#udp-trial-gate-panel h2{margin:0 0 12px;font-size:1.4rem;color:#111}
+#udp-trial-gate-panel p{margin:0 0 24px;color:#444;line-height:1.5}
+#udp-trial-gate-panel a{display:inline-block;padding:12px 28px;background:#2563eb;
+  color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:1rem}
+#udp-trial-gate-panel a:hover{background:#1d4ed8}
+@media(prefers-color-scheme:dark){
+  #udp-trial-gate-panel{background:#1e1e2e}
+  #udp-trial-gate-panel h2{color:#f0f0f0}
+  #udp-trial-gate-panel p{color:#bbb}
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var el=document.createElement('div');
+  el.id='udp-trial-gate';
+  el.setAttribute('aria-modal','true');
+  el.setAttribute('role','alertdialog');
+  el.innerHTML='<div id="udp-trial-gate-panel">'
+    +'<h2>Your free trial has ended</h2>'
+    +'<p>Your 7-day trial of UDP Social has expired. Start a plan to restore access to your network and keep everything you’ve built.</p>'
+    +'<a href="{$_udp_plan_url}">Start your plan</a>'
+    +'</div>';
+  document.body.appendChild(el);
+  document.body.style.overflow='hidden';
+});
+</script>
+HTML;
+		} else {
+			// Dismissible top banner — injected into <body> after DOM ready.
+			$_udp_label = $_udp_days_left === 1 ? '1 day' : "{$_udp_days_left} days";
+			DI::page()['htmlhead'] .= <<<HTML
+<style>
+#udp-trial-bar{position:fixed;top:0;left:0;right:0;z-index:9999;
+  background:#2563eb;color:#fff;font-size:.875rem;padding:7px 16px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,.18);line-height:1.4}
+#udp-trial-bar a{color:#fff;font-weight:600;text-decoration:underline;white-space:nowrap}
+#udp-trial-bar button{background:none;border:none;color:#fff;cursor:pointer;
+  font-size:1.2rem;line-height:1;padding:0 2px;margin-left:6px;opacity:.75;flex-shrink:0}
+#udp-trial-bar button:hover{opacity:1}
+body.udp-bar-on{padding-top:36px!important}
+</style>
+<script>
+(function(){
+  var KEY='udp_trial_dismissed';
+  try{if(localStorage.getItem(KEY)==='1')return;}catch(e){}
+  document.addEventListener('DOMContentLoaded',function(){
+    var bar=document.createElement('div');
+    bar.id='udp-trial-bar';
+    bar.setAttribute('aria-live','polite');
+    bar.innerHTML='<span>⏳ <strong>{$_udp_label}</strong> left in your free trial</span>'
+      +'<a href="{$_udp_plan_url}">Start your plan</a>'
+      +'<button aria-label="Dismiss">×</button>';
+    document.body.insertAdjacentElement('afterbegin',bar);
+    document.body.classList.add('udp-bar-on');
+    bar.querySelector('button').addEventListener('click',function(){
+      bar.remove();
+      document.body.classList.remove('udp-bar-on');
+      try{localStorage.setItem(KEY,'1');}catch(e){}
+    });
+  });
+}());
+</script>
+HTML;
+		}
+	}
+
 	// Recent-colors palette on the Display Settings page
 	if (str_ends_with(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '', '/settings/display')) {
 		DI::page()['htmlhead'] .= <<<'HTML'
