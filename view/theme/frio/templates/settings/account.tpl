@@ -53,11 +53,6 @@
 						{{include file="field_input.tpl" field=$email}}
 						{{include file="field_password.tpl" field=$password4}}
 
-						{{if $oid_enable}}
-							{{include file="field_input.tpl" field=$openid}}
-							{{include file="field_checkbox.tpl" field=$delete_openid}}
-						{{/if}}
-
 						{{include file="field_custom.tpl" field=$timezone}}
 						{{include file="field_select.tpl" field=$language}}
 						{{include file="field_input.tpl" field=$default_location}}
