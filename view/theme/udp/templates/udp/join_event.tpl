@@ -3,7 +3,7 @@
 
 {{if $state == 'success'}}
 	<h2>Check your email!</h2>
-	<p>We sent a login link to your inbox. Click it to set up your account on <strong>{{$sitename|escape}}</strong>.</p>
+	<p>We sent a login link to your inbox. Click it to set up your account on <strong>{{$sitename}}</strong>.</p>
 	<p class="text-muted" style="font-size:.9em;">The link expires in 1 hour. Check your spam folder if you don't see it.</p>
 
 {{elseif $state == 'closed'}}
@@ -11,7 +11,7 @@
 	<p>The sign-up window for this event has ended. Contact the group admin if you need access.</p>
 
 {{else}}
-	<h2>Join {{$sitename|escape}}</h2>
+	<h2>Join {{$sitename}}</h2>
 	<p>Enter your name and email below and we'll send you a one-click login link.</p>
 
 	<form method="post" action="/join?t={{$token|escape:'url'}}">

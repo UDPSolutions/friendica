@@ -237,9 +237,9 @@ abstract class MailBuilder
 
 		$this->senderNoReply ??= $this->senderAddress;
 
-		$msgHtml = $this->getHtmlMessage() ?? '';
+		$msgHtml = $this->getHtmlMessage();
 
-		if (!$raw) {
+		if (!$raw && $msgHtml !== null) {
 			// UDP-HARNESS: Smarty unavailable in CLI bootstrap; skip HTML wrapper.
 			// Remove this try/catch before prod deploy.
 			try {
@@ -268,7 +268,7 @@ abstract class MailBuilder
 			$this->senderNoReply,
 			$this->recipientAddress,
 			$this->getSubject() ?? '',
-			$msgHtml,
+			$msgHtml ?? '',
 			$this->getPlaintextMessage() ?? '',
 			$this->headers,
 			$this->recipientUid ?? null,
