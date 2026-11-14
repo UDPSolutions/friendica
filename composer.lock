@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ff1e34b17e0e5e1aafe69cbb18dff64",
+    "content-hash": "12af81554e7ab9fca2f90d8a84e770ea",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -962,8 +962,14 @@
             "version": "1.1.4",
             "source": {
                 "type": "git",
-                "url": "https://git.friendi.ca/friendica/php-json-ld",
+                "url": "https://github.com/UDPSolutions/php-json-ld",
                 "reference": "1f33c8766b5cfbecfbc2122238873debeed35fb6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/UDPSolutions/php-json-ld/zipball/1f33c8766b5cfbecfbc2122238873debeed35fb6",
+                "reference": "1f33c8766b5cfbecfbc2122238873debeed35fb6",
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",
