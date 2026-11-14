@@ -95,7 +95,8 @@
 	"repositories": [
 		{
 			"type": "vcs",
-			"url": "https://git.friendi.ca/friendica/php-json-ld"
+			"url": "https://github.com/UDPSolutions/php-json-ld",
+			"no-api": true
 		},
 		{
 			"type": "composer",
