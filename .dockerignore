@@ -19,3 +19,11 @@ Dockerfile
 # Logs and local state
 view/smarty3/compiled/
 view/smarty3/cache/
+*.log
+
+# Built inside the image (see Dockerfile stage 1) — never from the context
+vendor/
+
+# Local working files that are not part of the app
+claude/
+deploy.sh
