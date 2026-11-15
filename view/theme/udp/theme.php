@@ -25,10 +25,13 @@ function udp_init(AppHelper $appHelper)
 	// Friendica uses App::VERSION (e.g. "2026.01") as the ?v= param for all assets,
 	// which never changes between our deploys. Adding ?udp=N gives us a distinct URL
 	// that Page::registerStylesheet() won't overwrite (it only merges the 'v' key),
-	// so browsers re-fetch when we increment this string.
+	// so browsers re-fetch when it changes. Keyed to style.php's mtime so every deploy
+	// that touches style.php busts the cache automatically (frio's ETag only hashes
+	// frio's CSS, so UDP additions alone would otherwise 304 against stale copies).
 	// Must also append puid so style.pcss applies the logged-in user's scheme/accent.
 	$_udp_puid = \Friendica\Model\Profile::getThemeUid(DI::appHelper());
-	$_udp_qs   = 'udp=5' . ($_udp_puid ? '&puid=' . $_udp_puid : '');
+	$_udp_ver  = @filemtime(__DIR__ . '/style.php') ?: 5;
+	$_udp_qs   = 'udp=' . $_udp_ver . ($_udp_puid ? '&puid=' . $_udp_puid : '');
 	Renderer::$theme['stylesheet'] = 'view/theme/udp/style.pcss?' . $_udp_qs;
 
 	// UDP always routes "New post" directly to /compose — no jot modal

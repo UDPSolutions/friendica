@@ -15,6 +15,12 @@ echo ob_get_clean();
 $udp_nav_bg         = !empty($nav_bg)         ? $nav_bg         : '#1565c0';
 $udp_nav_icon_color = !empty($nav_icon_color) ? $nav_icon_color : '#ffffff';
 
+// Mobile tab strip colors: white bar + nav-colored text on light schemes; mirror
+// frio's dark/black #topbar-second treatment (nav_bg bar, link_color text).
+$udp_dark_scheme   = isset($scheme) && in_array($scheme, ['dark', 'black'], true);
+$udp_tabstrip_bg   = $udp_dark_scheme ? $udp_nav_bg : '#ffffff';
+$udp_tabstrip_text = $udp_dark_scheme ? (!empty($link_color) ? $link_color : '#ffffff') : $udp_nav_bg;
+
 // Pre-compute base URL here (before CSS output mode) to avoid DI::baseUrl()
 // being called inline inside the template, which fatals if DI isn't fully
 // initialized in the theme compilation context.
@@ -182,6 +188,48 @@ $udp_base_url = rtrim((string) \Friendica\DI::baseUrl(), '/');
 /* ---- Mobile only: compact container ---- */
 @media (max-width: 767px) {
 	.container { padding-left: 8px; padding-right: 8px; }
+}
+
+/* ---- Mobile tab strip (common_tabs.tpl) — replaces #topbar-second tabs ---- */
+#udp-tabstrip { display: none; }
+
+@media (max-width: 767px) {
+	#udp-tabstrip {
+		display: block;
+		position: sticky;
+		top: 48px;
+		z-index: 1010;
+		margin: 0 0 8px;
+		background: <?= $udp_tabstrip_bg ?>;
+		border-bottom: 1px solid rgba(0,0,0,0.12);
+		box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+	}
+	#udp-tabstrip ul {
+		position: relative;
+		display: flex;
+		gap: 4px;
+		margin: 0;
+		padding: 0 8px;
+		list-style: none;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+	#udp-tabstrip ul::-webkit-scrollbar { display: none; }
+	#udp-tabstrip li { flex: 0 0 auto; }
+	#udp-tabstrip a {
+		display: block;
+		padding: 10px 10px 8px;
+		font-size: 14px;
+		white-space: nowrap;
+		color: <?= $udp_tabstrip_text ?>;
+		border-bottom: 3px solid transparent;
+		text-decoration: none;
+	}
+	#udp-tabstrip li.active a {
+		font-weight: 600;
+		border-bottom-color: <?= $udp_tabstrip_text ?>;
+	}
 }
 
 /* ---- Search bar (toggleable below top bar) ---- */
