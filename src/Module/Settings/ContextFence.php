@@ -51,8 +51,8 @@ class ContextFence extends BaseSettings
 		}
 
 		if (!empty($request['add_fence'])) {
-			$handleA = trim($request['contact_a'] ?? '');
-			$handleC = trim($request['contact_c'] ?? '');
+			$handleA = self::normaliseHandle($request['contact_a'] ?? '');
+			$handleC = self::normaliseHandle($request['contact_c'] ?? '');
 
 			if (empty($handleA) || empty($handleC)) {
 				DI::sysmsg()->addNotice($this->t('Please enter both people.'));
@@ -88,6 +88,19 @@ class ContextFence extends BaseSettings
 			$fence->add($uid, (int)$contactA['id'], $nodeA, (int)$contactC['id'], $nodeC);
 			DI::sysmsg()->addInfo($this->t('They\'ll be kept apart in conversations you join.'));
 		}
+	}
+
+	/**
+	 * Contact::getByURL matches `addr` exactly (nick@host), so the Fediverse-style
+	 * "@nick@host" and "acct:nick@host" forms people naturally type must be reduced to it.
+	 */
+	private static function normaliseHandle(string $handle): string
+	{
+		$handle = trim($handle);
+		if (stripos($handle, 'acct:') === 0) {
+			$handle = substr($handle, 5);
+		}
+		return ltrim($handle, '@');
 	}
 
 	protected function content(array $request = []): string
