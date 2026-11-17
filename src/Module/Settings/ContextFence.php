@@ -122,7 +122,7 @@ class ContextFence extends BaseSettings
 		$tpl = Renderer::getMarkupTemplate('settings/context_fence.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'$form_security_token' => self::getFormSecurityToken('settings_context_fences'),
-			'$baseurl'             => $this->baseUrl->get(),
+			'$baseurl'             => $this->baseUrl,
 			'$l10n' => [
 				'title'       => $this->t('Keep apart'),
 				'intro'       => $this->t('Know two people who shouldn\'t see each other\'s posts? Add them here, and conversations you take part in won\'t carry one person\'s posts or replies across to the other. This keeps their two neighborhood servers apart, so it covers their neighbors too.'),
