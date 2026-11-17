@@ -46,7 +46,7 @@ class ContextFence extends BaseSettings
 
 		if (!empty($request['remove_fence'])) {
 			$fence->remove((int)$request['remove_fence'], $uid);
-			DI::sysmsg()->addInfo($this->t('Context fence removed.'));
+			DI::sysmsg()->addInfo($this->t('Removed.'));
 			return;
 		}
 
@@ -55,7 +55,7 @@ class ContextFence extends BaseSettings
 			$handleC = trim($request['contact_c'] ?? '');
 
 			if (empty($handleA) || empty($handleC)) {
-				DI::sysmsg()->addNotice($this->t('Please provide both contacts.'));
+				DI::sysmsg()->addNotice($this->t('Please enter both people.'));
 				return;
 			}
 
@@ -63,12 +63,12 @@ class ContextFence extends BaseSettings
 			$contactC = Contact::getByURLForUser($handleC, $uid, false, ['id', 'url']);
 
 			if (empty($contactA['id']) || empty($contactC['id'])) {
-				DI::sysmsg()->addNotice($this->t('One or both contacts could not be found in your contact list.'));
+				DI::sysmsg()->addNotice($this->t('One or both of those people aren\'t in your contacts.'));
 				return;
 			}
 
 			if ($contactA['id'] === $contactC['id']) {
-				DI::sysmsg()->addNotice($this->t('Please provide two different contacts.'));
+				DI::sysmsg()->addNotice($this->t('Please enter two different people.'));
 				return;
 			}
 
@@ -76,17 +76,17 @@ class ContextFence extends BaseSettings
 			$nodeC = parse_url($contactC['url'], PHP_URL_HOST) ?? '';
 
 			if (empty($nodeA) || empty($nodeC)) {
-				DI::sysmsg()->addNotice($this->t('Could not determine home nodes for the given contacts.'));
+				DI::sysmsg()->addNotice($this->t('Couldn\'t tell which server one of those people is on.'));
 				return;
 			}
 
 			if ($nodeA === $nodeC) {
-				DI::sysmsg()->addNotice($this->t('Both contacts are on the same node — no fence needed.'));
+				DI::sysmsg()->addNotice($this->t('Those two people are on the same server, so this can\'t keep them apart.'));
 				return;
 			}
 
 			$fence->add($uid, (int)$contactA['id'], $nodeA, (int)$contactC['id'], $nodeC);
-			DI::sysmsg()->addInfo($this->t('Context fence added.'));
+			DI::sysmsg()->addInfo($this->t('They\'ll be kept apart in conversations you join.'));
 		}
 	}
 
@@ -124,17 +124,17 @@ class ContextFence extends BaseSettings
 			'$form_security_token' => self::getFormSecurityToken('settings_context_fences'),
 			'$baseurl'             => $this->baseUrl->get(),
 			'$l10n' => [
-				'title'       => $this->t('Context Fences'),
-				'intro'       => $this->t('Context fences prevent your replies from bridging content between people who should not see each other\'s posts. When you reply to a post from one fenced node, no activity is delivered to the other fenced node.'),
-				'addtitle'    => $this->t('Add a fence'),
-				'contact_a'   => [$this->t('Contact A'), '', $this->t('Profile URL or handle (e.g. alice@example.social)')],
-				'contact_c'   => [$this->t('Contact C'), '', $this->t('Profile URL or handle (e.g. carol@other.example)')],
-				'addsubmit'   => $this->t('Add fence'),
-				'listtitle'   => $this->t('Active fences'),
+				'title'       => $this->t('Keep apart'),
+				'intro'       => $this->t('Know two people who shouldn\'t see each other\'s posts? Add them here, and conversations you take part in won\'t carry one person\'s posts or replies across to the other. This keeps their two neighborhood servers apart, so it covers their neighbors too.'),
+				'addtitle'    => $this->t('Keep two people apart'),
+				'contact_a'   => [$this->t('First person'), '', $this->t('Profile URL or handle (e.g. alice@example.social)')],
+				'contact_c'   => [$this->t('Second person'), '', $this->t('Profile URL or handle (e.g. carol@other.example)')],
+				'addsubmit'   => $this->t('Keep apart'),
+				'listtitle'   => $this->t('People you\'re keeping apart'),
 				'node_a_lbl'  => $this->t('Node'),
 				'node_c_lbl'  => $this->t('Node'),
 				'remove'      => $this->t('Remove'),
-				'nofences'    => $this->t('No context fences configured.'),
+				'nofences'    => $this->t('You aren\'t keeping anyone apart.'),
 			],
 			'$entries' => $entries,
 		]);

@@ -154,6 +154,14 @@ class BaseSettings extends BaseModule
 			'accesskey' => 's',
 		];
 
+		// UDP: context fences, shown to users as "Keep apart"
+		$tabs[] = [
+			'label'     => $this->t('Keep apart'),
+			'url'       => 'settings/context-fences',
+			'selected'  => static::class == Settings\ContextFence::class ? 'active' : '',
+			'accesskey' => '',
+		];
+
 		$tabs[] = [
 			'label'     => $this->t('Import Contacts'),
 			'url'       => 'settings/importcontacts',

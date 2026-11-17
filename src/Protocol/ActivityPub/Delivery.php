@@ -103,6 +103,26 @@ class Delivery
 			}
 		}
 
+		// UDP: single outbound filter. Every ActivityPub delivery ends here, whichever path queued it
+		// (own posts, thread-owner relays, mentions, likes, deletes), so every one is screened.
+		// See "Reply Audience Model — Spec", enforcement map row 4.
+		if (empty($uri_id) && !empty($item_id) && ($cmd != ProtocolDelivery::MAIL)) {
+			$uri_id = (int)(Post::selectFirst(['uri-id'], ['id' => $item_id])['uri-id'] ?? 0);
+		}
+		$blocked = self::udpOutboundBlockReason($cmd, $uri_id, $uid, $inbox);
+		if ($blocked !== '') {
+			DI::logger()->notice('UDP outbound filter dropped delivery', ['reason' => $blocked, 'cmd' => $cmd, 'uri-id' => $uri_id, 'item_id' => $item_id, 'uid' => $uid, 'inbox' => $inbox]);
+			// Durable trace of the latest drop, read by harness vignettes T-22/T-23 (no log access there).
+			DI::keyValue()->set('udp_outbound_last_drop', sprintf('%s %s %d %.4f', $blocked, parse_url($inbox, PHP_URL_HOST) ?? '', $uri_id, microtime(true)));
+			if ($uri_id) {
+				Post\Delivery::remove($uri_id, $inbox);
+			}
+			if ($cmd == ProtocolDelivery::POST) {
+				Post\DeliveryData::incrementQueueDone($uri_id, Post\DeliveryData::ACTIVITYPUB);
+			}
+			return ['success' => true, 'serverfailure' => false, 'drop' => true];
+		}
+
 		$success    = true;
 		$serverfail = false;
 		$drop       = false;
@@ -198,6 +218,41 @@ class Delivery
 		}
 
 		return ['success' => $success, 'serverfailure' => $serverfail, 'drop' => $drop];
+	}
+
+	/**
+	 * UDP: decide whether a delivery may leave this server.
+	 *
+	 * 1. Gateway: the inbox's domain must be on the outbound allowlist (every command).
+	 * 2. Context fences: for anything carrying a post, walk the post and its ancestors
+	 *    (ContextFence::getAncestorNodes starts at the post itself, so a relayed reply's
+	 *    own author node is included) and refuse if the sending user has fenced any of
+	 *    those nodes against the inbox's node.
+	 *
+	 * @return string '' when allowed, otherwise the reason ('gateway' or 'fence')
+	 */
+	private static function udpOutboundBlockReason(string $cmd, int $uri_id, int $uid, string $inbox): string
+	{
+		$domain = parse_url($inbox, PHP_URL_HOST) ?? '';
+		if (!DI::federationGateway()->isAllowedOutbound($domain)) {
+			return 'gateway';
+		}
+
+		// These commands carry no post (mail ids are not post ids), so there is no thread to fence.
+		if (in_array($cmd, [ProtocolDelivery::MAIL, ProtocolDelivery::SUGGESTION, ProtocolDelivery::RELOCATION, ProtocolDelivery::REMOVAL, ProtocolDelivery::PROFILEUPDATE])) {
+			return '';
+		}
+
+		// Unresolvable post: nothing to build an activity from either, so the send below fails on its own.
+		if (empty($uri_id) || empty($uid)) {
+			return '';
+		}
+
+		if (DI::contextFence()->isAncestorFenced($uid, $uri_id, $domain)) {
+			return 'fence';
+		}
+
+		return '';
 	}
 
 	/**
