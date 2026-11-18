@@ -1362,6 +1362,12 @@ class User
 			'register_date'    => DateTimeFormat::utcNow(),
 			'default-location' => '',
 			'hidewall'         => true, // UDP: high-privacy default; users change in Settings → Privacy
+			// UDP: quiet email default. Upstream's 65535 emails every post from any "bell"ed contact
+			// (Type::SHARE), which has no checkbox in Settings → Account, so users can't turn it off.
+			// Bells stay in-app only. Dropped: SHARE, SUGGEST, POKE. Backfill: udp-utils/scripts/quiet_notify_flags.php
+			'notify-flags'     => Notification\Type::INTRO | Notification\Type::CONFIRM | Notification\Type::WALL
+				| Notification\Type::COMMENT | Notification\Type::MAIL | Notification\Type::TAG_SELF
+				| Notification\Type::SYSTEM, // = 32927
 		]);
 
 		if ($insert_result) {
