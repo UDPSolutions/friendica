@@ -571,3 +571,102 @@ a.udp-banner-brand {
 
 /* ---- Contact card: prevent single-char orphans on long addresses ---- */
 aside .vcard .p-addr { word-break: break-all; }
+
+/* ---- Floating help box (theme.php udp_help_box + udp/help_box.tpl) ----
+   Bottom-right; frio's back-to-top button moves up to sit above it. */
+#udp-help {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	z-index: 1030; /* above #udp-bottom-nav (1020), below Bootstrap modals (1050) */
+}
+.udp-help-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 40px;
+	padding: 0 16px;
+	border: none;
+	border-radius: 20px;
+	background-color: <?= $udp_nav_bg ?>;
+	color: <?= $udp_nav_icon_color ?>;
+	font-weight: 600;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+	cursor: pointer;
+}
+.udp-help-toggle .fa { font-size: 1.3em; }
+.udp-help-toggle:focus-visible { outline: 3px solid <?= $udp_nav_bg ?>; outline-offset: 3px; }
+.udp-help-panel {
+	position: absolute;
+	right: 0;
+	bottom: 52px;
+	width: 300px;
+	max-width: calc(100vw - 24px);
+	max-height: 60vh;
+	overflow-y: auto;
+	margin: 0;
+	padding: 12px 14px;
+	border-radius: 10px;
+	box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+}
+.udp-help-panel[hidden] { display: none; }
+.udp-help-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 6px;
+}
+.udp-help-close {
+	background: none;
+	border: none;
+	font-size: 1.5em;
+	line-height: 1;
+	padding: 0 4px;
+	color: inherit;
+	opacity: 0.6;
+	cursor: pointer;
+}
+.udp-help-close:hover { opacity: 1; }
+.udp-help-links { list-style: none; margin: 0; padding: 0; }
+.udp-help-links li a {
+	display: block;
+	padding: 8px 2px;
+	border-bottom: 1px solid rgba(128,128,128,0.2);
+}
+.udp-help-links li:last-child a { border-bottom: none; }
+.udp-help-foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid rgba(128,128,128,0.2);
+	font-size: 0.9em;
+}
+.udp-help-foot form { margin: 0; }
+.udp-help-hide {
+	background: none;
+	border: none;
+	padding: 0;
+	color: inherit;
+	opacity: 0.7;
+	text-decoration: underline;
+	cursor: pointer;
+}
+.udp-help-hide:hover { opacity: 1; }
+body.udp-help-on #back-to-top { bottom: 72px; }
+.udp-help-list li { margin-bottom: 4px; }
+
+@media (max-width: 767px) {
+	/* Clear the fixed bottom nav (56px + iOS safe area); icon-only button */
+	#udp-help { right: 10px; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }
+	.udp-help-toggle { width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 50%; }
+	.udp-help-toggle .udp-help-label { display: none; }
+	.udp-help-panel { bottom: 54px; }
+	body.udp-help-on #back-to-top { bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media print {
+	#udp-help { display: none; }
+}

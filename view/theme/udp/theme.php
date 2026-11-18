@@ -229,6 +229,40 @@ setTimeout(init,400);
 </script>
 HTML;
 	}
+
+	udp_help_box();
+}
+
+/**
+ * Floating help box (bottom corner) linking blog.udp.social user-guide articles.
+ * Logged-in local users only; skipped when hidden via /help (pconfig udp.help_hidden)
+ * and on the /help page itself. Plan: ~/udp/Help-Box-Plan.md
+ */
+function udp_help_box(): void
+{
+	$uid = DI::userSession()->getLocalUserId();
+	if (!$uid || DI::args()->getModuleName() === 'help') {
+		return;
+	}
+
+	try {
+		if (\Friendica\Util\UdpHelpFeed::isHidden($uid)) {
+			return;
+		}
+		$items = \Friendica\Util\UdpHelpFeed::forPage(
+			\Friendica\Util\UdpHelpFeed::currentPageKey(),
+			DI::userSession()->isSiteAdmin()
+		);
+		DI::page()['footer'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('udp/help_box.tpl'), [
+			'$items'               => $items,
+			'$help_center_url'     => \Friendica\Util\UdpHelpFeed::HELP_CENTER_URL,
+			'$return_path'         => \Friendica\Module\UdpHelp::safeReturnPath((string) DI::args()->getQueryString()),
+			'$form_security_token' => \Friendica\BaseModule::getFormSecurityToken(\Friendica\Module\UdpHelp::FORM_TOKEN),
+		]);
+	} catch (\Throwable $e) {
+		// The help box must never take a page down.
+		DI::logger()->warning('UDP help box failed', ['error' => $e->getMessage()]);
+	}
 }
 
 function udp_install()
