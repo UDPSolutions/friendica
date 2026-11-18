@@ -25,14 +25,18 @@ class Outbox extends BaseApi
 			$this->jsonExit([], 'application/activity+json');
 		}
 
-		DI::federationFilter()->checkInboundFetch($_SERVER);
+		$uid = self::getCurrentUserID();
+
+		// UDP: federated (signed) fetches are allowlist-gated; an authenticated local C2S client is not.
+		if (empty($uid)) {
+			DI::federationFilter()->checkInboundContentFetch($_SERVER);
+		}
 
 		$owner = User::getOwnerDataByNick($this->parameters['nickname']);
 		if (empty($owner)) {
 			throw new \Friendica\Network\HTTPException\NotFoundException();
 		}
 
-		$uid  = self::getCurrentUserID();
 		$page = $request['page'] ?? null;
 
 		if (empty($page) && empty($request['max_id']) && !empty($uid)) {

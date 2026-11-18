@@ -34,7 +34,7 @@ class Objects extends BaseModule
 			DI::baseUrl()->redirect(str_replace('objects/', 'display/', DI::args()->getQueryString()));
 		}
 
-		DI::federationFilter()->checkInboundFetch($_SERVER);
+		DI::federationFilter()->checkInboundContentFetch($_SERVER);
 
 		$itemuri = DBA::selectFirst('item-uri', ['id'], ['guid' => $this->parameters['guid']]);
 

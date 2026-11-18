@@ -4,6 +4,7 @@ namespace Friendica\UDP\Federation;
 
 use Friendica\Object\Search\ContactResult;
 use Friendica\Object\Search\ResultList;
+use Friendica\Util\HTTPSignature;
 
 /**
  * Applies the UDP allowlist to higher-level objects before any outbound probe
@@ -86,6 +87,32 @@ class Filter
 	 */
 	public function checkInboundFetch(array $server): void
 	{
+	}
+
+	/**
+	 * Gate AP *content* endpoints (outbox, objects, featured, followers, following):
+	 * require a valid HTTP signature whose signer is on the allowlist. Unsigned or
+	 * non-allowlisted requests get 403 (surface I-4).
+	 *
+	 * Unlike the actor document (checkInboundFetch, left open for discovery), nothing
+	 * legitimate fetches these unsigned: Friendica and Mastodon sign every fetch with
+	 * the user's or the instance actor's key. The keyId host is screened first, so a
+	 * non-allowlisted signer never triggers an outbound key fetch.
+	 */
+	public function checkInboundContentFetch(array $server): void
+	{
+		$keyIdHost = '';
+		if (preg_match('/keyId="([^"]+)"/', $server['HTTP_SIGNATURE'] ?? '', $matches)) {
+			$keyIdHost = parse_url($matches[1], PHP_URL_HOST) ?? '';
+		}
+		// Throws 403 for unsigned (empty host) or non-allowlisted; no-op when the gateway is off.
+		$this->gateway->checkInbound($keyIdHost);
+		if (!$this->gateway->isEnabled()) {
+			return;
+		}
+
+		$signer = HTTPSignature::getSigner('', $server);
+		$this->gateway->checkInbound($signer ? (parse_url($signer, PHP_URL_HOST) ?? '') : '');
 	}
 
 	/**

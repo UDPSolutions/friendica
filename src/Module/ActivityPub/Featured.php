@@ -24,7 +24,7 @@ class Featured extends BaseModule
 			throw new \Friendica\Network\HTTPException\NotFoundException();
 		}
 
-		DI::federationFilter()->checkInboundFetch($_SERVER);
+		DI::federationFilter()->checkInboundContentFetch($_SERVER);
 
 		$owner = User::getOwnerDataByNick($this->parameters['nickname']);
 		if (empty($owner)) {

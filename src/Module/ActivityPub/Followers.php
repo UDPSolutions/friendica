@@ -26,7 +26,7 @@ class Followers extends BaseModule
 			throw new \Friendica\Network\HTTPException\NotFoundException();
 		}
 
-		DI::federationFilter()->checkInboundFetch($_SERVER);
+		DI::federationFilter()->checkInboundContentFetch($_SERVER);
 
 		// @TODO: Replace with parameter from router
 		$owner = User::getOwnerDataByNick($this->parameters['nickname']);

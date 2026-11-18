@@ -33,6 +33,14 @@ class Gateway
 	}
 
 	/**
+	 * True unless the operator switched the UDP gateway off (udp.gateway_enabled = false).
+	 */
+	public function isEnabled(): bool
+	{
+		return (bool)$this->config->get('udp', 'gateway_enabled', true);
+	}
+
+	/**
 	 * Assert an inbound actor domain is on the allowlist.
 	 * Throws ForbiddenException (→ HTTP 403) if not.
 	 */
