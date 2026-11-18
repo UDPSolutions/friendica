@@ -230,6 +230,15 @@ $udp_base_url = rtrim((string) \Friendica\DI::baseUrl(), '/');
 		font-weight: 600;
 		border-bottom-color: <?= $udp_tabstrip_text ?>;
 	}
+
+	/* Slide-out side menu (frio: aside z-index 10, padding-top 100px for its two-row header).
+	   Sit above the sticky tab strip (1010) so the menu and its dim overlay cover it, but below
+	   #udp-topbar (1020). Closed aside is display:none (jasny .offcanvas), so it can't block taps.
+	   Padding matches the single 48px UDP top bar. */
+	aside {
+		z-index: 1012 !important;
+		padding-top: 56px !important;
+	}
 }
 
 /* ---- Search bar (toggleable below top bar) ---- */
