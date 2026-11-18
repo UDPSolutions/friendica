@@ -546,7 +546,10 @@ class Widget
 				$dend        = substr($dnow, 0, 8) . Temporal::getDaysInMonth(intval($dnow), intval(substr($dnow, 5)));
 				$start_month = $dstart;
 				$end_month   = $dend;
-				$str         = DI::l10n()->formatDateTimeByPattern($dnow, 'LLLL');
+				// UDP: label from mid-month. formatDateTimeByPattern() parses the bare date as UTC midnight
+				// and renders it in the session timezone, so the 1st became the previous month west of UTC
+				// (America/New_York: July link labelled "June"). No offset can move the 15th across a month.
+				$str         = DI::l10n()->formatDateTimeByPattern(substr($dnow, 0, 8) . '15', 'LLLL');
 
 				if (empty($ret[$dyear])) {
 					$ret[$dyear] = [];
