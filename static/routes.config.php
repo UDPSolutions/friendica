@@ -460,7 +460,7 @@ return [
 		'/{circle:\d+}/hashtags'                           => [Module\Udp\CircleHashtag::class, [R::GET, R::POST]],
 	],
 	'/hashtag'                    => [Module\Hashtag::class,           [R::GET]],
-	'/help[/{doc:.+}]'            => [Module\UdpHelp::class,           [R::GET]],
+	'/help[/{doc:.+}]'            => [Module\UdpHelp::class,           [R::GET, R::POST]], // UDP: POST toggles the floating help button
 	'/home'                       => [Module\UdpHome::class,           [R::GET]], // UDP: redirect logged-in users to /feed
 	'/hcard/{profile}[/{action}]' => [Module\HCard::class,             [R::GET]],
 	'/inbox[/{nickname}]'         => [Module\ActivityPub\Inbox::class, [R::GET, R::POST]],
