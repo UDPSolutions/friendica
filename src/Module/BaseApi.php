@@ -77,8 +77,41 @@ class BaseApi extends BaseModule
 	 *
 	 * @throws HTTPException\ForbiddenException
 	 */
+	/**
+	 * UDP: client-API modules a client may call before logging in (surface I-9).
+	 * Matched as class-name prefixes, so a namespace entry covers its sub-modules.
+	 */
+	private const UDP_ANONYMOUS_API = [
+		'Friendica\\Module\\Api\\Mastodon\\Apps',
+		'Friendica\\Module\\Api\\Mastodon\\CustomEmojis',
+		'Friendica\\Module\\Api\\Mastodon\\Instance',     // also InstanceV2 and Instance\*
+		'Friendica\\Module\\Api\\Mastodon\\Unimplemented',
+		'Friendica\\Module\\Api\\GNUSocial\\GNUSocial\\',  // statusnet/config + version
+		'Friendica\\Module\\Api\\GNUSocial\\Help\\Test',
+	];
+
 	public function run(ModuleHTTPException $httpException, array $request = [], bool $scopecheck = true): ResponseInterface
 	{
+		// UDP: walled garden — no anonymous reads of the client API. Upstream only checks
+		// block_public on a few timelines; statuses/:id, context, accounts/:id/statuses,
+		// directory etc. served public posts to anyone. See federation posture, I-9.
+		if (($this->args->getMethod() === Router::GET)
+			&& str_starts_with(static::class, 'Friendica\\Module\\Api\\')
+			&& DI::config()->get('udp', 'gateway_enabled', true)
+			&& !self::getCurrentUserID()
+		) {
+			$anonymousOk = false;
+			foreach (self::UDP_ANONYMOUS_API as $prefix) {
+				if (str_starts_with(static::class, $prefix)) {
+					$anonymousOk = true;
+					break;
+				}
+			}
+			if (!$anonymousOk) {
+				throw new HTTPException\UnauthorizedException($this->t('This API requires login'));
+			}
+		}
+
 		if ($scopecheck) {
 			switch ($this->args->getMethod()) {
 				case Router::DELETE:
