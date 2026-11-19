@@ -25,6 +25,9 @@ class DisplayNotFound extends \Friendica\BaseModule
 			$this->t("You have ignored the top-level author's server or the shared post author's server."),
 		];
 
+		// UDP: a missing/deleted/invisible conversation is a 404, not a 200 page.
+		$this->response->setStatus(404, 'Not Found');
+
 		$tpl = Renderer::getMarkupTemplate('special/displaynotfound.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'$l10n' => [
