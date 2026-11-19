@@ -29,7 +29,7 @@ class PairEndpoint extends BaseModule
 	protected function rawContent(array $request = []): void
 	{
 		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-			$this->jsonExit(['success' => false, 'error' => 'POST required'], 'application/json', 405);
+			$this->jsonError(405, ['success' => false, 'error' => 'POST required']);
 		}
 
 		$body = Network::postdata();
@@ -39,24 +39,24 @@ class PairEndpoint extends BaseModule
 		$requesting_domain = $data['requesting_domain'] ?? '';
 
 		if (!$token || !$requesting_domain) {
-			$this->jsonExit(['success' => false, 'error' => 'missing token or requesting_domain'], 'application/json', 400);
+			$this->jsonError(400, ['success' => false, 'error' => 'missing token or requesting_domain']);
 		}
 
 		// Validate the token
 		$stored = DI::config()->get('udp_pair', $token);
 		if (!$stored) {
-			$this->jsonExit(['success' => false, 'error' => 'token not found'], 'application/json', 403);
+			$this->jsonError(403, ['success' => false, 'error' => 'token not found']);
 		}
 
 		$pair_data = json_decode($stored, true);
 		if (empty($pair_data['expires_at']) || $pair_data['expires_at'] < time()) {
 			DI::config()->delete('udp_pair', $token);
-			$this->jsonExit(['success' => false, 'error' => 'token expired'], 'application/json', 403);
+			$this->jsonError(403, ['success' => false, 'error' => 'token expired']);
 		}
 
 		// Validate requesting_domain before touching any config
 		if (!$this->isValidHostname($requesting_domain)) {
-			$this->jsonExit(['success' => false, 'error' => 'invalid requesting_domain'], 'application/json', 400);
+			$this->jsonError(400, ['success' => false, 'error' => 'invalid requesting_domain']);
 		}
 
 		// Consume token — single-use unless flagged multi_use (group broadcast tokens)

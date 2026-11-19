@@ -1235,6 +1235,11 @@ class User
 			if (!Register::existsByHash($invite_id)) {
 				throw new Exception(DI::l10n()->t('Invitation could not be verified.'));
 			}
+
+			// UDP: invitations expire (the invite emails promise 7 days).
+			if (!Register::isUnexpiredInvitation($invite_id)) {
+				throw new Exception(DI::l10n()->t('This invitation has expired. Please ask for a new one.'));
+			}
 		}
 
 		/// @todo Check if this part is really needed. We should have fetched all this data in advance

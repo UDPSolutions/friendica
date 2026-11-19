@@ -80,6 +80,29 @@ class Register
 	}
 
 	/**
+	 * UDP: invitation lifetime. Every invite email promises "it expires in 7 days"
+	 * (MemberInvite, MemberInviteApprove); upstream never expires invite codes.
+	 */
+	const INVITATION_TTL_DAYS = 7;
+
+	/**
+	 * UDP: true if an invite code exists and was created within INVITATION_TTL_DAYS.
+	 * Harness: run_vignettes_i_r.yml R-3.
+	 *
+	 * @param  string $hash
+	 * @return boolean
+	 * @throws \Exception
+	 */
+	public static function isUnexpiredInvitation(string $hash): bool
+	{
+		return DBA::exists('register', [
+			"`hash` = ? AND `created` > ?",
+			$hash,
+			DateTimeFormat::utc('now - ' . self::INVITATION_TTL_DAYS . ' days'),
+		]);
+	}
+
+	/**
 	 * Creates a register record for an invitation and returns the auto-generated code for it
 	 *
 	 * @return string

@@ -53,6 +53,21 @@ abstract class BaseAdmin extends BaseModule
 		}
 	}
 
+	/**
+	 * UDP: enforce admin access on every admin POST, not only on page render.
+	 * BaseModule::post() is a no-op, so admin modules calling parent::post() (NodePair,
+	 * Takedown, MemberInviteApprove, MemberPairApprove) previously relied on the form token
+	 * alone to stop non-admins. Non-interactive: 401 when logged out, 403 for non-admins.
+	 * Harness: run_vignettes_i_r.yml I-1c, I-11b.
+	 *
+	 * @throws HTTPException\ForbiddenException
+	 * @throws HTTPException\UnauthorizedException
+	 */
+	protected function post(array $request = [])
+	{
+		self::checkAdminAccess();
+	}
+
 	protected function content(array $request = []): string
 	{
 		self::checkAdminAccess(true);

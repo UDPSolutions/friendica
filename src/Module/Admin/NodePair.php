@@ -96,14 +96,16 @@ class NodePair extends BaseAdmin
 				HttpClientRequest::ACTIVITYPUB
 			);
 
-			if (!$result->isSuccess()) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('Could not reach %s or the token was rejected. Make sure the token has not expired (24 h limit).', $remote_domain));
+			// UDP: /udp/pair answers rejections with 4xx + {"success":false,"error":…}, so read
+			// the reason from the body whatever the status.
+			$response = json_decode($result->getBodyString(), true);
+			if (!empty($response['error'])) {
+				DI::sysmsg()->addNotice(DI::l10n()->t('Pairing rejected by %s: %s', $remote_domain, $response['error']));
 				DI::baseUrl()->redirect('admin/node-pair/accept');
 			}
 
-			$response = json_decode($result->getBodyString(), true);
-			if (empty($response['success'])) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('Pairing rejected by %s: %s', $remote_domain, $response['error'] ?? 'unknown error'));
+			if (!$result->isSuccess() || empty($response['success'])) {
+				DI::sysmsg()->addNotice(DI::l10n()->t('Could not reach %s or the token was rejected. Make sure the token has not expired (24 h limit).', $remote_domain));
 				DI::baseUrl()->redirect('admin/node-pair/accept');
 			}
 
