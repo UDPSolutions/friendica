@@ -382,10 +382,10 @@ class Contact extends BaseModule
 				'accesskey' => 'h',
 			],
 			[
-				'label'     => DI::l10n()->t('Lists'),
+				'label'     => DI::l10n()->t('Circles'), // UDP: Lists → Circles
 				'url'       => 'circle',
 				'sel'       => '',
-				'title'     => DI::l10n()->t('Organize your contact lists'),
+				'title'     => DI::l10n()->t('Organize your circles'),
 				'id'        => 'contactcircles-tab',
 				'accesskey' => 'e',
 			],

@@ -138,7 +138,7 @@ class UdpWelcome
 					. '<ul>'
 					. '<li><strong>All followers</strong>: people who follow you</li>'
 					. '<li><strong>Your neighborhood</strong>: everyone in ' . $site . ' and the communities it\'s paired with</li>'
-					. '<li><strong>Lists</strong> or <strong>specific people</strong>: just the ones you pick</li>'
+					. '<li>A <strong>circle</strong> or <strong>specific people</strong>: just the ones you pick</li>'
 					. '</ul>'
 					. '<p>New posts start out private. You widen the audience one post at a time, only when you mean to.</p>',
 				'try_url'   => 'compose',
@@ -157,6 +157,20 @@ class UdpWelcome
 				'try_label' => 'Go to Contacts',
 			],
 			[
+				'key'       => 'circles-groups',
+				'icon'      => 'object-group',
+				'title'     => 'Circles and Groups',
+				'body'      => '<p><strong>Circles</strong> are just for you. Sort the people and sites you follow into circles like '
+					. '<em>Family</em>, <em>Neighbors</em> or <em>News</em>. Pick a circle to read only those posts, or to send a post only to them. '
+					. 'Nobody can see which circles you\'ve put them in.</p>'
+					. '<p><strong>Groups</strong> are shared spaces. Everyone in a group can post to it, and every member sees every post. '
+					. 'Think family chat, team, or book club. Start one under <strong>Groups</strong>, then post from the group\'s page, '
+					. 'or type <code>#!</code> and the group\'s name in any post.</p>'
+					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Rule of thumb: a circle is <em>your</em> view of people; a group is a room you share with them.</p>',
+				'try_url'   => 'udp/group',
+				'try_label' => 'See your Groups',
+			],
+			[
 				'key'       => 'profile',
 				'icon'      => 'user-circle',
 				'title'     => 'Make it yours',
@@ -164,6 +178,34 @@ class UdpWelcome
 					. '<p>Your profile isn\'t on the open web: search engines and strangers can\'t see it. You choose what goes on it.</p>',
 				'try_url'   => 'settings/profile/photo',
 				'try_label' => 'Add a photo',
+			],
+			[
+				'key'   => 'home-screen',
+				'icon'  => 'mobile',
+				'title' => 'Put it on your home screen',
+				'body'  => '<p>There\'s no app to download. ' . $Site . ' runs in your phone\'s web browser, and you can give it its own icon:</p>'
+					. '<ul>'
+					. '<li><strong>iPhone (Safari):</strong> tap <strong>Share</strong> <i class="fa fa-share-square-o" aria-hidden="true"></i>, then <strong>Add to Home Screen</strong>.</li>'
+					. '<li><strong>Android (Chrome):</strong> tap the <strong>⋮</strong> menu, then <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>'
+					. '</ul>'
+					. '<p>It opens full-screen, just like an app. On a computer right now? Open <strong>' . self::e(DI::baseUrl()->getHost()) . '</strong> on your phone to do this.</p>'
+					. '<p class="udp-tour-tip"><i class="fa fa-shield" aria-hidden="true"></i> <strong>Safer than an app.</strong> '
+					. 'A home-screen icon can\'t read your contacts or follow your location in the background, has no ad-tracking code tucked inside, '
+					. 'and never needs updating. You always get the latest version.</p>',
+			],
+			[
+				'key'       => 'feeds',
+				'icon'      => 'rss',
+				'title'     => 'Follow your favorite sites',
+				'body'      => '<p>Many news sites, blogs and podcasts publish an <strong>RSS feed</strong>. Follow one here and its new articles show up in your timeline, right alongside your people.</p>'
+					. '<ol>'
+					. '<li>Find the site\'s feed address: look for the <i class="fa fa-rss" aria-hidden="true"></i> RSS icon. Or just try the site\'s main address; that often works too.</li>'
+					. '<li>Under <strong>Contacts</strong>, paste it into <strong>Add New Contact</strong> and follow it.</li>'
+					. '</ol>'
+					. '<p>Feeds only come in. Nothing you post goes back to the site.</p>'
+					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Busy sites post a lot. Put them in their own <strong>circle</strong> (say, "News") so they don\'t crowd out your people.</p>',
+				'try_url'   => 'contact',
+				'try_label' => 'Add a feed',
 			],
 			[
 				'key'       => 'notifications',
@@ -264,7 +306,10 @@ class UdpWelcome
 	 */
 	private static function siteName(bool $sentenceStart = false): string
 	{
-		$name = trim((string) DI::config()->get('system', 'sitename', ''));
+		// config.sitename is Friendica's canonical key (page titles, emails, web manifest);
+		// system.sitename is what deploy_slot.yml sets. Prefer the canonical one.
+		$name = trim((string) DI::config()->get('config', 'sitename', ''))
+			?: trim((string) DI::config()->get('system', 'sitename', ''));
 		if ($name !== '') {
 			return $name;
 		}
