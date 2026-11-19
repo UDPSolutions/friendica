@@ -241,7 +241,9 @@ HTML;
 function udp_help_box(): void
 {
 	$uid = DI::userSession()->getLocalUserId();
-	if (!$uid || DI::args()->getModuleName() === 'help') {
+	// Not on /help itself, nor on the walkthrough (it would only repeat what the tour says).
+	if (!$uid || DI::args()->getModuleName() === 'help'
+		|| str_starts_with(ltrim(DI::args()->getCommand(), '/'), 'udp/welcome')) {
 		return;
 	}
 

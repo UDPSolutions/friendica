@@ -1,6 +1,12 @@
 <div class="generic-page-wrapper udp-help-page">
 <h2>Help</h2>
 
+{{if $logged_in}}
+<h3>New here?</h3>
+<p>A two-minute tour of your timeline, posting, finding people, and alerts.</p>
+<p><a class="btn btn-primary" href="udp/welcome"><i class="fa fa-compass" aria-hidden="true"></i> Take the tour</a></p>
+{{/if}}
+
 <h3>User guide</h3>
 {{if $guide}}
 <ul class="udp-help-list">

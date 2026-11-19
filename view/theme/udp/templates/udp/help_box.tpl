@@ -16,6 +16,7 @@
 			<li><a href="{{$help_center_url}}" target="_blank" rel="noopener">Open the user guide</a></li>
 			{{/foreach}}
 		</ul>
+		<p class="udp-help-tour"><a href="udp/welcome"><i class="fa fa-compass" aria-hidden="true"></i> Take the tour</a></p>
 		<div class="udp-help-foot">
 			<a href="help">More help</a>
 			<form method="post" action="help">

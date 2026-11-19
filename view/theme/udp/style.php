@@ -667,6 +667,80 @@ body.udp-help-on #back-to-top { bottom: 72px; }
 	body.udp-help-on #back-to-top { bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
 }
 
+.udp-help-tour { margin: 8px 0 0; font-weight: 600; }
+
+/* ---- First-run walkthrough (/udp/welcome — Module\Udp\Welcome + udp/welcome.tpl) ---- */
+.udp-tour { max-width: 560px; margin: 0 auto; }
+.udp-tour-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+	font-size: 0.9em;
+	opacity: 0.8;
+}
+.udp-tour-skip { margin: 0; }
+.udp-tour-skip button {
+	background: none;
+	border: none;
+	padding: 4px 0;
+	color: inherit;
+	text-decoration: underline;
+	cursor: pointer;
+}
+.udp-tour-dots {
+	display: flex;
+	gap: 6px;
+	list-style: none;
+	margin: 0 0 18px;
+	padding: 0;
+}
+.udp-tour-dots li { flex: 1; }
+.udp-tour-dots a {
+	display: block;
+	height: 6px;
+	border-radius: 3px;
+	background: rgba(128,128,128,0.25);
+}
+.udp-tour-dots li.done a,
+.udp-tour-dots li.active a { background: <?= $udp_nav_bg ?>; }
+.udp-tour-dots li.done a { opacity: 0.5; }
+.udp-tour-card { text-align: left; }
+.udp-tour-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 64px;
+	height: 64px;
+	margin-bottom: 12px;
+	border-radius: 50%;
+	background: <?= $udp_nav_bg ?>;
+	color: <?= $udp_nav_icon_color ?>;
+	font-size: 30px;
+}
+.udp-tour-card h2 { margin: 0 0 12px; font-size: 1.6em; line-height: 1.25; }
+.udp-tour-body { font-size: 1.08em; line-height: 1.55; }
+.udp-tour-body ul { padding-left: 1.2em; }
+.udp-tour-body li { margin-bottom: 4px; }
+.udp-tour-tip {
+	padding: 10px 12px;
+	border-left: 4px solid <?= $udp_nav_bg ?>;
+	background: rgba(128,128,128,0.08);
+	border-radius: 4px;
+}
+.udp-tour-try { margin-top: 14px; font-weight: 600; }
+.udp-tour-nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 24px;
+	padding-top: 16px;
+	border-top: 1px solid rgba(128,128,128,0.2);
+}
+.udp-tour-nav form { margin: 0; }
+.udp-tour-nav .btn { min-height: 44px; padding-left: 18px; padding-right: 18px; }
+
 @media print {
 	#udp-help { display: none; }
 }

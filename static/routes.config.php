@@ -680,6 +680,7 @@ return [
 	'/udp/member-invite-approve/{token}'   => [Module\Udp\MemberInviteApprove::class, [R::GET, R::POST]], // UDP: admin approval for member invite
 	'/udp/member-pair-approve/{token}'     => [Module\Udp\MemberPairApprove::class,   [R::GET, R::POST]], // UDP: admin confirmation for Flow B node-pairing request
 	'/udp/move-account'            => [Module\Udp\MoveAccount::class,      [R::GET, R::POST]],  // UDP: self-service account move
+	'/udp/welcome'                 => [Module\Udp\Welcome::class,          [R::GET, R::POST]],  // UDP: first-run walkthrough (auto-launch from /timeline)
 	'/udp/group' => [
 		''                                    => [Module\Udp\Group\Index::class,   [R::GET]],          // list my Group Circles
 		'/create'                             => [Module\Udp\Group\Create::class,  [R::GET, R::POST]], // create a new circle

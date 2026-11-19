@@ -51,6 +51,14 @@ class UdpFeed extends Network
 			$this->baseUrl->redirect('login');
 		}
 
+		// UDP: first visit of a new account → the walkthrough (once; skip/finish marks it done).
+		// Only on the plain page load, never on the infinite-scroll/update requests.
+		if (empty($request['mode']) && empty($request['last_received']) && empty($request['last_commented'])
+			&& empty($request['last_created']) && empty($request['last_uriid'])
+			&& \Friendica\Util\UdpWelcome::shouldAutoLaunch((int) $this->session->getLocalUserId())) {
+			$this->baseUrl->redirect('udp/welcome');
+		}
+
 		$o = parent::content($request);
 
 		Nav::setSelected('network');
