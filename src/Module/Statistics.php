@@ -54,7 +54,7 @@ class Statistics extends BaseModule
 	protected function rawContent(array $request = [])
 	{
 		$registration_open = Register::getPolicy() !== Register::CLOSED
-			&& !$this->config->get('config', 'invitation_only');
+			&& !$this->config->get('system', 'invitation_only'); // UDP: was 'config' — enforcement reads 'system'
 
 		/// @todo mark the "service" addons and load them dynamically here
 		$services = [

@@ -164,7 +164,8 @@ class Friendica extends BaseModule
 		];
 
 		$register_policy_int = Register::getPolicy();
-		if ($register_policy_int !== Register::CLOSED && $this->config->get('config', 'invitation_only')) {
+		// UDP: was 'config' — enforcement (Register, User::create, Invite) reads 'system'
+		if ($register_policy_int !== Register::CLOSED && $this->config->get('system', 'invitation_only')) {
 			$register_policy = 'REGISTER_INVITATION';
 		} else {
 			$register_policy = $register_policies[$register_policy_int];
