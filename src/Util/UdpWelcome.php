@@ -72,7 +72,8 @@ class UdpWelcome
 	 */
 	public static function steps(bool $isAdmin, bool $postPending = false): array
 	{
-		$site  = self::e((string) DI::config()->get('system', 'sitename', 'your community'));
+		$site  = self::e(self::siteName());
+		$Site  = self::e(self::siteName(true)); // sentence start
 		$admin = self::e(self::adminName());
 
 		$welcome = [
@@ -84,7 +85,7 @@ class UdpWelcome
 				. 'You run it; UDP keeps the lights on.</p>'
 				. '<p>No ads. No algorithm deciding what you see. Nobody training AI on your family\'s photos.</p>'
 				. '<p>This short tour shows you around. It takes about two minutes, and you can skip it any time.</p>'
-				: '<p>' . $site . ' is a small, private social network run by <strong>' . $admin . '</strong> for the people they know.</p>'
+				: '<p>' . $Site . ' is a small, private social network run by <strong>' . $admin . '</strong> for the people they know.</p>'
 				. '<p>No ads. No algorithm deciding what you see. Nobody training AI on your photos.</p>'
 				. '<p>This short tour shows you around. It takes about two minutes, and you can skip it any time.</p>',
 		];
@@ -238,7 +239,7 @@ class UdpWelcome
 	private static function welcomePostBody(): string
 	{
 		$base = (string) DI::baseUrl();
-		$site = (string) DI::config()->get('system', 'sitename', 'your community');
+		$site = self::siteName(true);
 
 		return "[b]This is your first post, and only you can see it.[/b] We put it here so your timeline isn't empty on day one. "
 			. "Delete it whenever you like.\n\n"
@@ -256,6 +257,19 @@ class UdpWelcome
 	}
 
 	// ── Helpers ───────────────────────────────────────────────────────────────
+
+	/**
+	 * The node's name, or "your community" when sitename is unset/empty. The fallback is capitalized
+	 * when it starts a sentence; a real sitename is never altered.
+	 */
+	private static function siteName(bool $sentenceStart = false): string
+	{
+		$name = trim((string) DI::config()->get('system', 'sitename', ''));
+		if ($name !== '') {
+			return $name;
+		}
+		return $sentenceStart ? 'Your community' : 'your community';
+	}
 
 	private static function adminName(): string
 	{
