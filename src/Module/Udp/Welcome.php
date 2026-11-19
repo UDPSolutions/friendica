@@ -47,7 +47,8 @@ class Welcome extends BaseModule
 		}
 
 		$isAdmin = DI::userSession()->isSiteAdmin();
-		$steps   = UdpWelcome::steps($isAdmin);
+		$pending = $isAdmin && !DI::userSession()->getSubManagedUserId() && UdpWelcome::welcomePostPending($uid);
+		$steps   = UdpWelcome::steps($isAdmin, $pending);
 		$count   = count($steps);
 		$index   = max(0, min($count - 1, (int) ($request['step'] ?? 0)));
 		$step    = $steps[$index];

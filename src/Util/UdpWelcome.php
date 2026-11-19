@@ -3,15 +3,17 @@
 // UDP Social — first-run walkthrough + owner welcome post (Cat2 — new file)
 //
 // The walkthrough (/udp/welcome) is a short server-rendered tour. It auto-launches once, from /timeline,
-// for accounts registered in the last AUTO_LAUNCH_DAYS days that haven't finished or skipped it
-// (pconfig udp.tour_done). It can be relaunched any time from the help box or /help.
+// for every account (new or existing) that hasn't finished or skipped it (pconfig udp.tour_done).
+// It can be relaunched any time from the help box or /help.
 //
-// When the node owner (site admin) leaves the tour (finish or skip), they get a one-time "Only me"
-// welcome post in their timeline: private, allow_cid = their own self contact, so the Notifier
-// finds no recipients and nothing leaves the node (pconfig udp.welcome_post holds its uri-id).
+// When the node owner (site admin) leaves the tour (finish or skip) and their timeline is still
+// near-empty (< NEAR_EMPTY_THREADS threads), they get a one-time "Only me" welcome post: private,
+// allow_cid = their own self contact, so the Notifier finds no recipients and nothing leaves the node
+// (pconfig udp.welcome_post holds its uri-id). Established owners get no post.
 
 namespace Friendica\Util;
 
+use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -19,10 +21,10 @@ use Friendica\Model\User;
 
 class UdpWelcome
 {
-	const PCONFIG_CAT       = 'udp';
-	const KEY_TOUR_DONE     = 'tour_done';
-	const KEY_WELCOME_POST  = 'welcome_post';
-	const AUTO_LAUNCH_DAYS  = 14;
+	const PCONFIG_CAT        = 'udp';
+	const KEY_TOUR_DONE      = 'tour_done';
+	const KEY_WELCOME_POST   = 'welcome_post';
+	const NEAR_EMPTY_THREADS = 5;
 
 	// ── Tour state ────────────────────────────────────────────────────────────
 
@@ -37,9 +39,8 @@ class UdpWelcome
 	}
 
 	/**
-	 * True when /timeline should send this user to the tour: a recent account that has never
-	 * finished or skipped it. Older accounts (everyone already on a node when this shipped)
-	 * are never redirected; they can still open it from Help.
+	 * True when /timeline should send this user to the tour: any account that has never
+	 * finished or skipped it, including accounts that existed before the tour shipped.
 	 */
 	public static function shouldAutoLaunch(int $uid): bool
 	{
@@ -47,15 +48,19 @@ class UdpWelcome
 			return false;
 		}
 		// Delegated / "manage as" sessions belong to someone else's account — don't hijack them.
-		if (DI::userSession()->getSubManagedUserId()) {
-			return false;
-		}
-		$user = User::getById($uid, ['register_date']);
-		if (empty($user['register_date'])) {
-			return false;
-		}
-		$registered = strtotime($user['register_date'] . ' UTC');
-		return $registered !== false && $registered >= time() - self::AUTO_LAUNCH_DAYS * 86400;
+		return !DI::userSession()->getSubManagedUserId();
+	}
+
+	/**
+	 * True when leaving the tour will create the owner's welcome post: site admin, no welcome post
+	 * yet, and a near-empty timeline (fewer than NEAR_EMPTY_THREADS threads of any kind).
+	 */
+	public static function welcomePostPending(int $uid): bool
+	{
+		return $uid
+			&& User::isSiteAdmin($uid)
+			&& !DI::pConfig()->get($uid, self::PCONFIG_CAT, self::KEY_WELCOME_POST)
+			&& DBA::count('post-thread-user', ['uid' => $uid]) < self::NEAR_EMPTY_THREADS;
 	}
 
 	// ── Steps ─────────────────────────────────────────────────────────────────
@@ -65,7 +70,7 @@ class UdpWelcome
 	 * dynamic values are escaped here), optional try_url/try_label (a local path to see it for real).
 	 * Admin-only steps are spliced in after the welcome step for the node owner.
 	 */
-	public static function steps(bool $isAdmin): array
+	public static function steps(bool $isAdmin, bool $postPending = false): array
 	{
 		$site  = self::e((string) DI::config()->get('system', 'sitename', 'your community'));
 		$admin = self::e(self::adminName());
@@ -177,7 +182,7 @@ class UdpWelcome
 			'body'  => '<p>See the <strong><i class="fa fa-question-circle" aria-hidden="true"></i> Help</strong> button in the bottom corner? It shows guide articles for whatever page you\'re on.</p>'
 				. '<p>You can take this tour again any time from <strong>Menu → Help</strong>.</p>'
 				. ($isAdmin
-					? '<p>That\'s it. Your first post is waiting in your timeline.</p>'
+					? ($postPending ? '<p>That\'s it. Your first post is waiting in your timeline.</p>' : '<p>That\'s it. Questions? <a href="mailto:support@udp.social">support@udp.social</a> reaches a person.</p>')
 					: '<p>Questions? Ask <strong>' . $admin . '</strong>. That\'s what neighbors are for.</p>'),
 		];
 
@@ -187,14 +192,14 @@ class UdpWelcome
 	// ── Owner welcome post ────────────────────────────────────────────────────
 
 	/**
-	 * Create the one-time "Only me" welcome post for the node owner. Idempotent (pconfig).
-	 * Returns the new item id, or 0 when skipped or failed. Never throws.
+	 * Create the one-time "Only me" welcome post for the node owner, only while their timeline is
+	 * near-empty (see welcomePostPending). Idempotent (pconfig). Returns the new item id, or 0 when
+	 * skipped or failed. Never throws.
 	 */
 	public static function ensureWelcomePost(int $uid): int
 	{
 		try {
-			if (!$uid || !User::isSiteAdmin($uid)
-				|| DI::pConfig()->get($uid, self::PCONFIG_CAT, self::KEY_WELCOME_POST)) {
+			if (!self::welcomePostPending($uid)) {
 				return 0;
 			}
 
