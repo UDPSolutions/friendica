@@ -96,14 +96,15 @@ class Display extends BaseModule
 		// Does the local user have this item?
 		if ($this->session->getLocalUserId()) {
 			$item = Post::selectFirstForUser($this->session->getLocalUserId(), $fields, [
-				'guid' => $guid,
-				'uid'  => $this->session->getLocalUserId(),
+				'guid'    => $guid,
+				'uid'     => $this->session->getLocalUserId(),
+				'deleted' => false, // UDP: deleted posts are gone, not just unlisted
 			]);
 		}
 
 		// Is this item private but could be visible to the remove visitor?
 		if (empty($item) && $this->session->getRemoteUserId()) {
-			$item = Post::selectFirst($fields, ['guid' => $guid, 'private' => Item::PRIVATE, 'origin' => true]);
+			$item = Post::selectFirst($fields, ['guid' => $guid, 'private' => Item::PRIVATE, 'origin' => true, 'deleted' => false]);
 			if (!empty($item)) {
 				if (!Contact::isFollower($this->session->getRemoteUserId(), $item['uid'])) {
 					$item = null;
@@ -119,6 +120,7 @@ class Display extends BaseModule
 				'guid'    => $guid,
 				'private' => [Item::PUBLIC, Item::UNLISTED],
 				'uid'     => 0,
+				'deleted' => false, // UDP
 			]);
 		}
 
@@ -247,7 +249,7 @@ class Display extends BaseModule
 			return '';
 		}
 
-		$condition = ["`uri-id` = ? AND `uid` IN (0, ?) " . $sql_extra, $item['uri-id'], $itemUid];
+		$condition = ["`uri-id` = ? AND `uid` IN (0, ?) AND NOT `deleted` " . $sql_extra, $item['uri-id'], $itemUid];
 		$fields    = [
 			'parent-uri-id', 'body', 'title', 'author-name', 'author-avatar', 'plink', 'author-id',
 			'owner-id', 'contact-id',

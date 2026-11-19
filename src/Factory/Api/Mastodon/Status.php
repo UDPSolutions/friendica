@@ -100,7 +100,8 @@ class Status extends BaseFactory
 		$fields = ['uri-id', 'uid', 'guid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'author-gsid', 'author-network', 'author-alias', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
 			'created', 'edited', 'commented', 'received', 'changed', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id',
 			'delivery_queue_count', 'delivery_queue_done','delivery_queue_failed', 'allow_cid', 'deny_cid', 'allow_gid', 'deny_gid', 'sensitive', 'postopts'];
-		$item = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
+		// UDP: never serve deleted posts (takedowns, user deletes); rows stay ~60 days for federation.
+		$item = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid], 'deleted' => false], ['order' => ['uid' => true]]);
 		if (!$item) {
 			$mail = DBA::selectFirst('mail', ['id'], ['uri-id' => $uriId, 'uid' => $uid]);
 			if ($mail) {
@@ -116,7 +117,7 @@ class Status extends BaseFactory
 			$account    = $this->mstdnAccountFactory->createFromUriId($item['author-uri-id'], $uid);
 			$uriId      = $item['thr-parent-id'];
 			$activity   = $item;
-			$item       = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
+			$item       = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid], 'deleted' => false], ['order' => ['uid' => true]]); // UDP: not deleted
 			if (!$item) {
 				throw new NotFoundException('Item with URI ID ' . $uriId . ' not found' . ($uid ? ' for user ' . $uid : '.'));
 			}
