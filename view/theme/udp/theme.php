@@ -231,6 +231,7 @@ HTML;
 	}
 
 	udp_help_box();
+	udp_spot_runtime();
 }
 
 /**
@@ -264,6 +265,23 @@ function udp_help_box(): void
 	} catch (\Throwable $e) {
 		// The help box must never take a page down.
 		DI::logger()->warning('UDP help box failed', ['error' => $e->getMessage()]);
+	}
+}
+
+/**
+ * Spotlight runtime ("Show me where" in the tour), on every page for logged-in local users so a
+ * multi-hop path (e.g. Menu → Contacts → » → Send an invitation) keeps highlighting across page loads.
+ * Inert unless the tour started a trail (sessionStorage). Template: udp/spot.tpl
+ */
+function udp_spot_runtime(): void
+{
+	if (!DI::userSession()->getLocalUserId()) {
+		return;
+	}
+	try {
+		DI::page()['footer'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('udp/spot.tpl'), []);
+	} catch (\Throwable $e) {
+		DI::logger()->warning('UDP spotlight runtime failed', ['error' => $e->getMessage()]);
 	}
 }
 

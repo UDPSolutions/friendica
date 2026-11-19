@@ -64,6 +64,8 @@ class Welcome extends BaseModule
 			'$prev'                => $index > 0 ? $index - 1 : null,
 			'$next'                => $index < $count - 1 ? $index + 1 : null,
 			'$is_last'             => $index === $count - 1,
+			// Multi-hop spotlight path for "Show me where" (theme udp/spot.tpl runtime follows it across pages).
+			'$path_json'           => json_encode($step['path'] ?? [], JSON_UNESCAPED_UNICODE),
 			'$form_security_token' => self::getFormSecurityToken(self::FORM_TOKEN),
 		]);
 	}

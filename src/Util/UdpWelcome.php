@@ -108,6 +108,12 @@ class UdpWelcome
 					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Our experience is that sitting with someone for five minutes beats any invitation email. Help them make their first post.</p>',
 				'try_url'   => 'invite',
 				'try_label' => 'Invite someone',
+				'path'      => [
+					['spot' => [['menu', 'Tap Menu ⋮.']]],
+					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
+					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
+					['page' => 'contact', 'spot' => [['invite', 'Send an invitation from here.']]],
+				],
 			],
 			[
 				'key'       => 'neighbors',
@@ -117,6 +123,12 @@ class UdpWelcome
 					. '<p>Paired communities make up your <strong>neighborhood</strong>. Posts marked "Your neighborhood" reach them, and nobody else.</p>',
 				'try_url'   => 'admin/node-pair',
 				'try_label' => 'See node pairing',
+				'path'      => [
+					['spot' => [['menu', 'Tap Menu ⋮.']]],
+					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
+					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
+					['page' => 'contact', 'spot' => [['node-pair', 'Pair with another community here.']]],
+				],
 			],
 		];
 
@@ -129,6 +141,9 @@ class UdpWelcome
 					. '<p>Nothing is ranked or promoted. You see everything from the people you chose, in order, and nothing from anyone else.</p>',
 				'try_url'   => 'timeline',
 				'try_label' => 'Open your timeline',
+				'path'      => [
+					['spot' => [['timeline', 'This is Home: your timeline.']]],
+				],
 			],
 			[
 				'key'       => 'posting',
@@ -143,6 +158,11 @@ class UdpWelcome
 					. '<p>New posts start out private. You widen the audience one post at a time, only when you mean to.</p>',
 				'try_url'   => 'compose',
 				'try_label' => 'Write a post',
+				'path'      => [
+					['spot' => [['post', 'Tap Post.'], ['timeline', 'Open Home.']]],
+					['spot' => [['compose-option', 'Choose "Compose a post".']]],
+					['page' => 'timeline', 'spot' => [['jot', 'Start a new post here.']]],
+				],
 			],
 			[
 				'key'       => 'connecting',
@@ -155,6 +175,12 @@ class UdpWelcome
 					. '</p>',
 				'try_url'   => 'contact',
 				'try_label' => 'Go to Contacts',
+				'path'      => [
+					['spot' => [['menu', 'Tap Menu ⋮.']]],
+					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
+					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
+					['page' => 'contact', 'spot' => [['follow-url', 'Type a name or paste an address here, then Follow.']]],
+				],
 			],
 			[
 				'key'       => 'circles-groups',
@@ -169,6 +195,10 @@ class UdpWelcome
 					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Rule of thumb: a circle is <em>your</em> view of people; a group is a room you share with them.</p>',
 				'try_url'   => 'udp/group',
 				'try_label' => 'See your Groups',
+				'path'      => [
+					['spot' => [['menu', 'Tap Menu ⋮.']]],
+					['spot' => [['groups', 'Groups live here. Circles are on the Contacts page.'], ['m-groups', 'Tap Groups.']]],
+				],
 			],
 			[
 				'key'       => 'profile',
@@ -178,6 +208,10 @@ class UdpWelcome
 					. '<p>Your profile isn\'t on the open web: search engines and strangers can\'t see it. You choose what goes on it.</p>',
 				'try_url'   => 'settings/profile/photo',
 				'try_label' => 'Add a photo',
+				'path'      => [
+					['spot' => [['profile', 'Tap Me for your profile.'], ['menu', 'Open your menu.']]],
+					['spot' => [['#nav-settings-link', 'Settings → Profile → Profile photo.']]],
+				],
 			],
 			[
 				'key'   => 'home-screen',
@@ -206,6 +240,12 @@ class UdpWelcome
 					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Busy sites post a lot. Put them in their own <strong>circle</strong> (say, "News") so they don\'t crowd out your people.</p>',
 				'try_url'   => 'contact',
 				'try_label' => 'Add a feed',
+				'path'      => [
+					['spot' => [['menu', 'Tap Menu ⋮.']]],
+					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
+					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
+					['page' => 'contact', 'spot' => [['follow-url', 'Paste the feed address here, then Follow.']]],
+				],
 			],
 			[
 				'key'       => 'notifications',
@@ -215,6 +255,9 @@ class UdpWelcome
 					. '<p>Everything else waits under <strong>Alerts</strong> until you\'re ready. You can change this under Settings → Account.</p>',
 				'try_url'   => 'notification',
 				'try_label' => 'See your alerts',
+				'path'      => [
+					['spot' => [['alerts', 'Alerts: everything that\'s waiting for you.']]],
+				],
 			],
 		];
 
@@ -227,6 +270,10 @@ class UdpWelcome
 				. ($isAdmin
 					? ($postPending ? '<p>That\'s it. Your first post is waiting in your timeline.</p>' : '<p>That\'s it. Questions? <a href="mailto:support@udp.social">support@udp.social</a> reaches a person.</p>')
 					: '<p>Questions? Ask <strong>' . $admin . '</strong>. That\'s what neighbors are for.</p>'),
+			'path'      => [
+				['spot' => [['menu', 'Tap Menu ⋮.']]],
+				['spot' => [['#nav-help-link', 'Help lives here.'], ['m-help', 'Help lives here.']]],
+			],
 		];
 
 		return array_merge([$welcome], $isAdmin ? $adminSteps : [], $memberSteps, [$help]);

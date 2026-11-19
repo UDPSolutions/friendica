@@ -14,7 +14,7 @@
 </a>
 {{/if}}
 <div class="btn-group pull-right" id="jotOpen">
-	<a id="udp-jot-main" class="action-button btn btn-primary" href="compose/{{$posttype}}{{if $group_circle_id}}?group_circle_id={{$group_circle_id}}{{elseif $content}}?body={{$content}}{{/if}}">
+	<a id="udp-jot-main" data-udp-spot="jot" class="action-button btn btn-primary" href="compose/{{$posttype}}{{if $group_circle_id}}?group_circle_id={{$group_circle_id}}{{elseif $content}}?body={{$content}}{{/if}}">
 		<i class="fa fa-lg fa-pencil"></i>
 		<span>{{$new_post}}</span>
 	</a>

@@ -52,7 +52,7 @@
 					</li>
 					{{if $nav.network}}
 					<li class="nav-segment">
-						<a accesskey="n" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}"
+						<a accesskey="n" data-udp-spot="timeline" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}"
 							data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.network.3}}" title="{{$nav.network.3}}">
 							<i class="fa fa-lg fa-th fa-fw" aria-hidden="true"></i>
 							<span id="net-update" class="nav-network-badge badge nav-notification"></span>
@@ -90,7 +90,7 @@
 					{{/if}}
 					{{if $nav.contacts}}
 					<li class="nav-segment hidden-xs">
-						<a accesskey="k" id="nav-contacts-link" href="{{$nav.contacts.0}}"
+						<a accesskey="k" id="nav-contacts-link" data-udp-spot="contacts" href="{{$nav.contacts.0}}"
 							data-toggle="tooltip" data-viewport="#topbar-first"
 							aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}"
 							class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}">
@@ -100,7 +100,7 @@
 					{{/if}}
 					{{if $userinfo}}
 					<li class="nav-segment hidden-xs">
-						<a href="{{$baseurl}}/udp/group" class="nav-menu"
+						<a href="{{$baseurl}}/udp/group" class="nav-menu" data-udp-spot="groups"
 							data-toggle="tooltip" data-viewport="#topbar-first"
 							aria-label="Groups" title="Groups">
 							<i class="fa fa-object-group fa-lg fa-fw" aria-hidden="true"></i>
@@ -109,7 +109,7 @@
 					{{/if}}
 					{{if $nav.notifications}}
 					<li id="nav-notification" class="nav-segment dropdown">
-						<button id="nav-notifications-menu-btn" class="btn-link dropdown-toggle" data-toggle="dropdown"
+						<button id="nav-notifications-menu-btn" data-udp-spot="alerts" class="btn-link dropdown-toggle" data-toggle="dropdown"
 							type="button" aria-haspopup="true" aria-expanded="false" aria-controls="nav-notifications-menu">
 							<span id="notification-update" class="nav-notification-badge badge nav-notification"></span>
 							<i class="fa fa-bell fa-lg" aria-label="{{$nav.notifications.1}}"></i>
@@ -158,7 +158,7 @@
 					{{/if}}
 
 					<li id="nav-user-linkmenu" class="dropdown account nav-menu hidden-xs">
-						<button accesskey="u" id="main-menu" class="btn-link dropdown-toggle nav-avatar"
+						<button accesskey="u" id="main-menu" data-udp-spot="menu" class="btn-link dropdown-toggle nav-avatar"
 							data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false"
 							aria-controls="nav-user-menu">
 							<div aria-hidden="true" class="user-title pull-left hidden-xs hidden-sm hidden-md">
@@ -446,7 +446,7 @@
 {{* Hidden on desktop via: @media (min-width:768px) { display:none }   *}}
 {{* ================================================================== *}}
 <header id="udp-topbar" role="banner">
-	<button type="button" id="udp-sidebar-toggle" class="udp-topbar-btn"
+	<button type="button" id="udp-sidebar-toggle" data-udp-spot="sidebar" class="udp-topbar-btn"
 		aria-label="Sidebar" data-toggle="offcanvas" data-target="aside">
 		<i class="fa fa-angle-double-right" aria-hidden="true"></i>
 	</button>
@@ -458,7 +458,7 @@
 			<i class="fa fa-search" aria-hidden="true"></i>
 		</button>
 		{{/if}}
-		<button type="button" id="udp-menu-toggle" class="udp-topbar-btn"
+		<button type="button" id="udp-menu-toggle" data-udp-spot="menu" class="udp-topbar-btn"
 			aria-label="Menu" aria-haspopup="dialog" aria-controls="udp-user-menu">
 			<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
 		</button>
@@ -479,7 +479,7 @@
 
 <nav id="udp-bottom-nav" role="navigation" aria-label="Main navigation">
 
-	<a href="{{$baseurl}}/timeline" class="udp-bottom-nav-item {{$sel.network}}"
+	<a href="{{$baseurl}}/timeline" data-udp-spot="timeline" class="udp-bottom-nav-item {{$sel.network}}"
 		aria-label="Home">
 		<i class="fa fa-home" aria-hidden="true"></i>
 		<span id="net-update" class="nav-network-badge badge nav-notification"></span>
@@ -487,7 +487,7 @@
 	</a>
 
 	{{if $nav.notifications}}
-	<a href="{{$nav.notifications.all.0}}" class="udp-bottom-nav-item"
+	<a href="{{$nav.notifications.all.0}}" data-udp-spot="alerts" class="udp-bottom-nav-item"
 		aria-label="{{$nav.notifications.1}}">
 		<i class="fa fa-bell" aria-hidden="true"></i>
 		<span id="notification-update" class="nav-notification-badge badge nav-notification"></span>
@@ -495,7 +495,7 @@
 	</a>
 	{{/if}}
 
-	<button type="button" id="udp-compose-btn" class="udp-bottom-nav-item udp-bottom-nav-compose"
+	<button type="button" id="udp-compose-btn" data-udp-spot="post" class="udp-bottom-nav-item udp-bottom-nav-compose"
 		aria-label="Compose" aria-haspopup="dialog" aria-controls="udp-compose-sheet">
 		<i class="fa fa-plus-circle" aria-hidden="true"></i>
 		<span class="udp-nav-label">Post</span>
@@ -510,7 +510,7 @@
 	</a>
 	{{/if}}
 
-	<a href="{{$nav.home.0}}" id="udp-me-btn" class="udp-bottom-nav-item"
+	<a href="{{$nav.home.0}}" id="udp-me-btn" data-udp-spot="profile" class="udp-bottom-nav-item"
 		aria-label="My profile">
 		<img src="{{$userinfo.icon}}" alt="" class="udp-nav-avatar" aria-hidden="true">
 		<span class="udp-nav-label">Me</span>
@@ -546,14 +546,14 @@
 
 			{{if $nav.contacts}}
 			<li>
-				<a href="{{$nav.contacts.0}}" title="{{$nav.contacts.3}}">
+				<a href="{{$nav.contacts.0}}" data-udp-spot="m-contacts" title="{{$nav.contacts.3}}">
 					<i class="fa fa-users fa-fw" aria-hidden="true"></i> {{$nav.contacts.1}}
 				</a>
 			</li>
 			{{/if}}
 
 			<li>
-				<a href="{{$baseurl}}/udp/group" title="Groups">
+				<a href="{{$baseurl}}/udp/group" data-udp-spot="m-groups" title="Groups">
 					<i class="fa fa-object-group fa-fw" aria-hidden="true"></i> Groups
 				</a>
 			</li>
@@ -586,7 +586,7 @@
 
 			{{if $nav.settings}}
 			<li>
-				<a href="{{$nav.settings.0}}" title="{{$nav.settings.3}}">
+				<a href="{{$nav.settings.0}}" data-udp-spot="m-settings" title="{{$nav.settings.3}}">
 					<i class="fa fa-cog fa-fw" aria-hidden="true"></i> {{$nav.settings.1}}
 				</a>
 			</li>
@@ -594,7 +594,7 @@
 
 			{{if $nav.admin}}
 			<li>
-				<a href="{{$nav.admin.0}}" title="{{$nav.admin.3}}">
+				<a href="{{$nav.admin.0}}" data-udp-spot="m-admin" title="{{$nav.admin.3}}">
 					<i class="fa fa-user-secret fa-fw" aria-hidden="true"></i> {{$nav.admin.1}}
 				</a>
 			</li>
@@ -610,7 +610,7 @@
 
 			{{if $nav.help}}
 			<li>
-				<a href="{{$nav.help.0}}" title="{{$nav.help.3}}">
+				<a href="{{$nav.help.0}}" data-udp-spot="m-help" title="{{$nav.help.3}}">
 					<i class="fa fa-question-circle fa-fw" aria-hidden="true"></i> {{$nav.help.1}}
 				</a>
 			</li>
@@ -641,7 +641,7 @@
 	<div class="udp-compose-sheet-backdrop"></div>
 	<div class="udp-compose-sheet-panel">
 		<div class="udp-compose-sheet-header">What would you like to share?</div>
-		<a href="{{$baseurl}}/compose" class="udp-compose-option">
+		<a href="{{$baseurl}}/compose" data-udp-spot="compose-option" class="udp-compose-option">
 			<span class="udp-compose-option-icon"><i class="fa fa-pencil" aria-hidden="true"></i></span>
 			<div class="udp-compose-option-text">
 				<strong>Compose a post</strong>

@@ -740,6 +740,50 @@ body.udp-help-on #back-to-top { bottom: 72px; }
 }
 .udp-tour-nav form { margin: 0; }
 .udp-tour-nav .btn { min-height: 44px; padding-left: 18px; padding-right: 18px; }
+.udp-tour-try { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+#udp-spot-show[hidden] { display: none; } /* .btn's display would otherwise beat [hidden] */
+
+/* Tour spotlight (udp/welcome.tpl): dim everything except one real nav button.
+   z-index above the nav bars (1020), help box (1030) and the mobile menu/compose sheets (2000),
+   so a hop inside an open sheet can still be spotlighted. */
+.udp-spot[hidden] { display: none; }
+.udp-spot-mask {
+	position: fixed;
+	inset: 0;
+	z-index: 2100;
+	background: rgba(0,0,0,0.62);
+	cursor: pointer;
+}
+.udp-spot-ring {
+	position: fixed;
+	z-index: 2101;
+	border-radius: 10px;
+	box-shadow: 0 0 0 3px #fff, 0 0 0 6px <?= $udp_nav_bg ?>;
+	pointer-events: none; /* clicks reach the real button underneath */
+	animation: udp-spot-pulse 1.6s ease-in-out infinite;
+}
+.udp-spot-callout {
+	position: fixed;
+	box-sizing: border-box; /* JS sets width incl. padding, keeping a 12px screen margin */
+	z-index: 2102;
+	padding: 12px 14px;
+	border-radius: 10px;
+	background: #fff;
+	color: #222;
+	box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+	font-size: 1.05em;
+	line-height: 1.4;
+}
+.udp-spot-text { margin: 0 0 10px; }
+.udp-spot-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.udp-spot-back[hidden] { display: none; }
+@keyframes udp-spot-pulse {
+	0%, 100% { box-shadow: 0 0 0 3px #fff, 0 0 0 6px <?= $udp_nav_bg ?>; }
+	50%      { box-shadow: 0 0 0 3px #fff, 0 0 0 12px <?= $udp_nav_bg ?>; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.udp-spot-ring { animation: none; }
+}
 
 @media print {
 	#udp-help { display: none; }
