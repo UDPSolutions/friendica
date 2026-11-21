@@ -99,6 +99,14 @@ HELP;
 			return 1;
 		}
 
+		// UDP: same gate as /udp/move-account — the destination must list this account in
+		// alsoKnownAs, and suspended/closed accounts are never vouched for.
+		$refusal = \Friendica\UDP\Federation\AccountMove::sourceRefusal($uid, $target_url);
+		if ($refusal !== '') {
+			$this->out('Refused: ' . $refusal);
+			return 1;
+		}
+
 		$this->out('Queueing Move activity for ' . $owner['addr'] . ' → ' . $target_url);
 
 		Worker::add(Worker::PRIORITY_HIGH, 'MoveAccount', $uid, $target_url);

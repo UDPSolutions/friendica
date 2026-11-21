@@ -58,6 +58,13 @@ class MoveAccount extends BaseModule
 			DI::baseUrl()->redirect('udp/move-account');
 		}
 
+		// UDP: the destination must claim this account (alsoKnownAs) and this node must vouch.
+		$refusal = \Friendica\UDP\Federation\AccountMove::sourceRefusal($uid, $target_url);
+		if ($refusal !== '') {
+			DI::sysmsg()->addNotice($refusal);
+			DI::baseUrl()->redirect('udp/move-account');
+		}
+
 		Worker::add(Worker::PRIORITY_HIGH, 'MoveAccount', $uid, $target_url);
 
 		DI::sysmsg()->addInfo(DI::l10n()->t(

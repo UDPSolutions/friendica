@@ -62,6 +62,11 @@ class ActivityPub
 				'@id'   => 'https://w3id.org/fep/044f#quoteAuthorization',
 				'@type' => '@id',
 			],
+			// UDP: account Move (same term as Mastodon's context; alsoKnownAs is in the AS context)
+			'movedTo' => [
+				'@id'   => 'as:movedTo',
+				'@type' => '@id',
+			],
 			'gts'               => 'https://gotosocial.org/ns#',
 			'interactionPolicy' => [
 				'@id'   => 'gts:interactionPolicy',

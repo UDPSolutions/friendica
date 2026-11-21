@@ -285,6 +285,16 @@ class Import extends \Friendica\BaseModule
 
 		$this->pconfig->set($newUid, 'system', 'previous_addr', $oldHandle);
 
+		// UDP: claim the old actor (alsoKnownAs) so the old node can send an honoured Move.
+		// The export file can only be downloaded from the old account's own session, and it
+		// carries that account's private key, so holding it proves control of the old account.
+		foreach ($account['contact'] as $oldSelf) {
+			if ($oldSelf['uid'] == $oldUid && $oldSelf['self'] == '1' && !empty($oldSelf['url'])) {
+				\Friendica\UDP\Federation\AccountMove::addLocalAlias($newUid, $oldSelf['url']);
+				break;
+			}
+		}
+
 		$errorCount = 0;
 
 		array_walk($account['contact'], function (&$contact) use (&$errorCount, $oldUid, $oldBaseUrl, $oldAddr, $newUid, $newBaseUrl, $newAddr) {

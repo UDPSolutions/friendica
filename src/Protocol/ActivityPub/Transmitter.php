@@ -393,6 +393,19 @@ class Transmitter
 			'publicKeyPem' => $owner['pubkey'],
 		];
 		$data['endpoints'] = ['sharedInbox' => DI::baseUrl() . '/inbox'];
+
+		// UDP: account Move handoff — published even on hidden profiles, receivers need it.
+		if ($uid != 0) {
+			$aliases = \Friendica\UDP\Federation\AccountMove::getLocalAliases($uid);
+			if (!empty($aliases)) {
+				$data['alsoKnownAs'] = $aliases;
+			}
+			$movedTo = \Friendica\UDP\Federation\AccountMove::getLocalMovedTo($uid);
+			if (!empty($movedTo)) {
+				$data['movedTo'] = $movedTo;
+			}
+		}
+
 		if ($full && $uid != 0) {
 			$data['icon'] = ['type' => 'Image', 'url' => User::getAvatarUrl($owner)];
 

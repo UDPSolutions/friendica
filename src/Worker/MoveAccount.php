@@ -34,6 +34,16 @@ class MoveAccount
 			return;
 		}
 
+		// UDP: re-check at send time (the queue may outlive a suspension or a withdrawn claim).
+		$refusal = \Friendica\UDP\Federation\AccountMove::sourceRefusal($uid, $target_url);
+		if ($refusal !== '') {
+			DI::logger()->notice('MoveAccount: refused at send time', ['uid' => $uid, 'target' => $target_url, 'reason' => $refusal]);
+			return;
+		}
+
+		// Publish movedTo in the actor document before anyone is told.
+		\Friendica\UDP\Federation\AccountMove::setLocalMovedTo($uid, $target_url);
+
 		$inboxes = ActivityPub\Transmitter::fetchTargetInboxesforUser($uid);
 
 		DI::logger()->info('MoveAccount: dispatching Move activity', ['uid' => $uid, 'target' => $target_url, 'inboxes' => count($inboxes)]);

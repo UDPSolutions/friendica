@@ -2427,6 +2427,15 @@ class Processor
 			return;
 		}
 
+		// UDP: honour a Move only if the destination claims the source (alsoKnownAs) and its
+		// domain is allowlisted here — a Move must never widen this node's federation.
+		$refusal = \Friendica\UDP\Federation\AccountMove::receiverRefusal($activity['object_id'], $activity['target_id']);
+		if ($refusal !== '') {
+			DI::logger()->notice('UDP move: refused', ['from' => $activity['object_id'], 'to' => $activity['target_id'], 'reason' => $refusal]);
+			Queue::remove($activity);
+			return;
+		}
+
 		$from = Contact::getByURL($activity['object_id'], false, ['uri-id']);
 		if (empty($from['uri-id'])) {
 			DI::logger()->info('Object not found', ['activity' => $activity]);
