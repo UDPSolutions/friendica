@@ -681,6 +681,7 @@ return [
 	'/udp/member-pair-approve/{token}'     => [Module\Udp\MemberPairApprove::class,   [R::GET, R::POST]], // UDP: admin confirmation for Flow B node-pairing request
 	'/udp/move-account'            => [Module\Udp\MoveAccount::class,      [R::GET, R::POST]],  // UDP: self-service account move
 	'/udp/welcome'                 => [Module\Udp\Welcome::class,          [R::GET, R::POST]],  // UDP: first-run walkthrough (auto-launch from /timeline)
+	'/udp/feedback[/{action:verify}]' => [Module\Udp\Feedback::class,      [R::GET]],           // UDP: "Leave feedback" hand-off to blog.udp.social; /verify is server-to-server
 	'/udp/group' => [
 		''                                    => [Module\Udp\Group\Index::class,   [R::GET]],          // list my Group Circles
 		'/create'                             => [Module\Udp\Group\Create::class,  [R::GET, R::POST]], // create a new circle

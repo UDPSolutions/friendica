@@ -26,6 +26,12 @@
 </ul>
 {{/if}}
 
+{{if $logged_in}}
+<h3>Tell us what you think</h3>
+<p>What's working, what's broken, what's confusing — it all goes straight to the UDP team.</p>
+<p><a class="btn btn-default" href="udp/feedback" target="_blank" rel="noopener"><i class="fa fa-comment-o" aria-hidden="true"></i> Leave feedback</a></p>
+{{/if}}
+
 <h3>Still stuck?</h3>
 {{if $is_admin}}
 

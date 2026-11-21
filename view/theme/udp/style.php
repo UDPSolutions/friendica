@@ -667,6 +667,7 @@ body.udp-help-on #back-to-top { bottom: 72px; }
 	body.udp-help-on #back-to-top { bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
 }
 
+.udp-help-feedback,
 .udp-help-tour { margin: 8px 0 0; font-weight: 600; }
 
 /* ---- First-run walkthrough (/udp/welcome — Module\Udp\Welcome + udp/welcome.tpl) ---- */
