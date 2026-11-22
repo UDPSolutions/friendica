@@ -1737,11 +1737,7 @@ class User
 	 */
 	public static function sendRegisterOpenEmail(L10n $l10n, array $user, string $sitename, string $siteurl, string $password)
 	{
-		$magic_token = Strings::getRandomHex(32);
-		DBA::update('user', [
-			'pwdreset'      => hash('sha256', $magic_token),
-			'pwdreset_time' => DateTimeFormat::utcNow(),
-		], ['uid' => $user['uid']]);
+		$magic_token = \Friendica\Module\Security\MagicLogin::issueToken($user['uid']);
 
 		$loginlink = $siteurl . '/login/magic/' . $magic_token;
 
@@ -1756,7 +1752,7 @@ class User
 		));
 		$body = Strings::deindent($l10n->t(
 			'
-			Click the link below to log in. The link expires in 1 hour.
+			Click the link below to log in. The link expires in 24 hours.
 
 			  %1$s
 
