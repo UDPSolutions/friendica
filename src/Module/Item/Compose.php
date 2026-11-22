@@ -40,6 +40,9 @@ use Psr\Log\LoggerInterface;
 
 class Compose extends BaseModule
 {
+	/** UDP ## circle-send sigil; see extractCircleTags(). */
+	private const CIRCLE_TAG_PATTERN = '/(?<![#\w])##([\w-]+)/u';
+
 	/** @var SystemMessages */
 	private $systemMessages;
 
@@ -117,9 +120,49 @@ class Compose extends BaseModule
 					}
 				}
 			}
+			// ## (circle send) syntax: ##Tag restricts the post to the poster's circle(s).
+			// Resolves via udp-circle-hashtag first, then circle name with non-tag characters
+			// removed (case-insensitive). Several ##tags → union of circles. ## overrides the audience
+			// picker. A Group (#! or group page) wins over ##.
+			// Unlike #!, an unmatched ##tag BLOCKS the post: the poster meant it to be private,
+			// and silently falling back to the picker audience could post publicly (2026-11-21).
+			$circleTags = self::extractCircleTags($request['body']);
+			if ($circleTags) {
+				if ($groupCircleId) {
+					$this->systemMessages->addNotice($this->l10n->t('Posted to the group only — ## circle tags are ignored in group posts.'));
+				} else {
+					$circleIds = [];
+					$unmatched = [];
+					foreach ($circleTags as $tag) {
+						$ids = self::resolveCircleTag($tag, $uid);
+						if ($ids) {
+							$circleIds = array_merge($circleIds, $ids);
+						} else {
+							$unmatched[] = '##' . $tag;
+						}
+					}
+					if ($unmatched) {
+						$this->systemMessages->addNotice($this->l10n->t(
+							'%s did not match any of your circles, so nothing was posted. Check the spelling, or remove the ## to post normally.',
+							implode(', ', $unmatched)
+						));
+						$this->session->set('udp_compose_draft', $request['body']);
+						$this->baseUrl->redirect('compose');
+					}
+					$_REQUEST['contact_allow'] = '';
+					$_REQUEST['contact_deny']  = '';
+					$_REQUEST['circle_allow']  = implode(',', array_unique($circleIds));
+					$_REQUEST['circle_deny']   = '';
+					$_REQUEST['visibility']    = 'custom';
+				}
+			}
+
 			// Strip #! routing directive from body — it's a send-time signal, not display content.
 			// \w* (not \w+) so a bare #! with no nick is also removed.
-			$_REQUEST['body'] = trim(preg_replace('/\s*#!(\w*)\s*/u', ' ', $request['body']));
+			$body = trim(preg_replace('/\s*#!(\w*)\s*/u', ' ', $request['body']));
+			// ##Tag → #Tag: keep it as an ordinary hashtag so udp-circle-hashtag routing files
+			// the post into the circle view and readers keep the context.
+			$_REQUEST['body'] = preg_replace(self::CIRCLE_TAG_PATTERN, '#$1', $body);
 
 			$_REQUEST['return'] = 'network';
 			require_once 'mod/item.php';
@@ -219,6 +262,14 @@ class Compose extends BaseModule
 		$sensitive = $request['sensitive'] ?? false;
 		$category  = $request['category']  ?? '';
 		$body      = $request['body']      ?? '';
+		// Restore a draft that post() bounced (unmatched ##tag) so nothing typed is lost.
+		$draft = $this->session->get('udp_compose_draft');
+		if ($draft !== null) {
+			$this->session->remove('udp_compose_draft');
+			if ($body === '') {
+				$body = $draft;
+			}
+		}
 		$location  = $request['location']  ?? $user['default-location'];
 		$wall      = $request['wall']      ?? $type == 'post';
 
@@ -333,5 +384,49 @@ class Compose extends BaseModule
 				'deny_gid'  => $circle_deny_list,
 			]),
 		]);
+	}
+
+	/**
+	 * UDP ## sigil: distinct lowercased tags from "##Tag" tokens. Not preceded by a word char
+	 * or '#' (so "###x" and "a##b" don't count, but "[b]##Tag[/b]" does — an unrecognised ##
+	 * would otherwise post with the picker audience). Charset matches CircleHashtag (a-z0-9_-).
+	 *
+	 * @return string[]
+	 */
+	private static function extractCircleTags(string $body): array
+	{
+		if (!preg_match_all(self::CIRCLE_TAG_PATTERN, $body, $m)) {
+			return [];
+		}
+		return array_values(array_unique(array_map('mb_strtolower', $m[1])));
+	}
+
+	/**
+	 * Resolve one ## tag to the poster's circle id(s): udp-circle-hashtag mapping first,
+	 * then circle name with non-tag characters removed, case-insensitive. Deleted circles never match.
+	 *
+	 * @return int[]
+	 */
+	private static function resolveCircleTag(string $tag, int $uid): array
+	{
+		$ids  = [];
+		$rows = DBA::selectToArray('udp-circle-hashtag', ['circle-id'], ['uid' => $uid, 'tag' => $tag]);
+		foreach ($rows as $row) {
+			if (DBA::exists('group', ['id' => $row['circle-id'], 'uid' => $uid, 'deleted' => false])) {
+				$ids[] = (int)$row['circle-id'];
+			}
+		}
+		if ($ids) {
+			return $ids;
+		}
+
+		$circles = DBA::selectToArray('group', ['id', 'name'], ['uid' => $uid, 'deleted' => false]);
+		foreach ($circles as $circle) {
+			// "Science!" → "science", "RSS - Comics" → "rss-comics": drop chars a tag can't hold
+			if (mb_strtolower(preg_replace('/[^\w-]/u', '', $circle['name'])) === $tag) {
+				$ids[] = (int)$circle['id'];
+			}
+		}
+		return $ids;
 	}
 }
