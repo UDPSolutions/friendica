@@ -490,6 +490,8 @@ return [
 	'/lostpass[/{token}]'    => [Module\LostPass::class, [R::GET, R::POST]],
 	'/login/magic/{token}'   => [Module\Security\MagicLogin::class, [R::GET, R::POST]],
 	'/firstlogin'            => [Module\Security\FirstLogin::class, [R::GET, R::POST]],
+	'/login/email'           => [Module\Security\MagicLinkRequest::class, [R::GET, R::POST]], // UDP: "Email me a sign-in link"
+	'/passkey/{action}'      => [Module\Security\Passkey::class,    [        R::POST]],        // UDP: WebAuthn ceremonies (JSON)
 	'/magic'                 => [Module\Magic::class,           [R::GET]],
 	'/manifest'              => [Module\Manifest::class,        [R::GET]],
 	'/manifest.json'         => [Module\Manifest::class,        [R::GET]],
@@ -656,6 +658,7 @@ return [
 		'/removeme'                    => [Module\Settings\RemoveMe::class,              [R::GET, R::POST]],
 		'/data-portability[/{action}]' => [Module\Settings\DataPortability::class,  [R::GET, R::POST]],
 		'/userexport[/{action}]'       => [Module\Settings\UserExport::class,       [R::GET         ]],
+		'/passkeys'                    => [Module\Settings\Passkeys::class,              [R::GET, R::POST]], // UDP
 		'/2fa'                         => [
 			'[/]'           => [Module\Settings\TwoFactor\Index::class,       [R::GET, R::POST]],
 			'/recovery'     => [Module\Settings\TwoFactor\Recovery::class,    [R::GET, R::POST]],

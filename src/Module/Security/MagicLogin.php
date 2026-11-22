@@ -95,6 +95,43 @@ final class MagicLogin extends BaseModule
 	}
 
 	/**
+	 * Email a sign-in link to an existing user (the "Email me a sign-in link" form).
+	 * The welcome email for new accounts is User::sendRegisterOpenEmail().
+	 *
+	 * @param array $user needs uid, username, nickname, email, language
+	 */
+	public static function sendLoginLink(array $user): bool
+	{
+		$token    = self::issueToken($user['uid']);
+		$siteurl  = (string)DI::baseUrl();
+		$sitename = DI::config()->get('config', 'sitename');
+		$l10n     = DI::l10n()->withLang($user['language'] ?: 'en');
+
+		$preamble = $l10n->t('Hi %s,', $user['username']);
+		$body     = Strings::deindent($l10n->t(
+			'
+			Here is your sign-in link for %1$s. It works once and expires in 24 hours.
+
+			  %2$s
+
+			Your username: %3$s
+
+			If you didn\'t ask for this, you can ignore this email. Nobody can sign in without the link.',
+			$sitename,
+			$siteurl . '/login/magic/' . $token,
+			$user['nickname'],
+		));
+
+		$email = DI::emailer()
+			->newSystemMail()
+			->withMessage($l10n->t('Your sign-in link for %s', $sitename), $preamble, $body)
+			->forUser($user)
+			->withRecipient($user['email'])
+			->build();
+		return DI::emailer()->send($email);
+	}
+
+	/**
 	 * Look up and validate the token from the route. Redirects (and exits) when invalid
 	 * or expired; returns the user record otherwise. Does not consume the token.
 	 */

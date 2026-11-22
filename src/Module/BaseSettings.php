@@ -69,6 +69,14 @@ class BaseSettings extends BaseModule
 			'accesskey' => 'o',
 		];
 
+		// UDP: passkeys (WebAuthn)
+		$tabs[] = [
+			'label'     => $this->t('Passkeys'),
+			'url'       => 'settings/passkeys',
+			'selected'  => static::class == Settings\Passkeys::class ? 'active' : '',
+			'accesskey' => 'k',
+		];
+
 		$tabs[] = [
 			'label'     => $this->t('Two-factor authentication'),
 			'url'       => 'settings/2fa',

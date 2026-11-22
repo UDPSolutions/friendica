@@ -183,6 +183,15 @@ class Login extends BaseModule
 
 				'$privacytitle' => DI::l10n()->t('Website Privacy Policy'),
 				'$privacylink'  => DI::l10n()->t('privacy policy'),
+
+				// UDP: passkeys + emailed sign-in link (used by view/theme/udp/templates/login.tpl)
+				'$passkey_label'       => DI::l10n()->t('Sign in with a passkey'),
+				'$passkey_options_url' => DI::baseUrl() . '/passkey/login-options',
+				'$passkey_login_url'   => DI::baseUrl() . '/passkey/login',
+				'$passkey_return_path' => $return_path ?? DI::args()->getQueryString(),
+				'$passkey_js'          => \Friendica\Module\Settings\Passkeys::scriptUrl(),
+				'$passkey_or'          => DI::l10n()->t('or'),
+				'$email_link_label'    => DI::l10n()->t('Email me a sign-in link'),
 			]
 		);
 
