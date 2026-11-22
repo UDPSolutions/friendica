@@ -356,6 +356,7 @@ return [
 	'/acctlink'          => [Module\Acctlink::class,     [R::GET]],
 	'/apps'              => [Module\Apps::class,         [R::GET]],
 	'/attach/{item:\d+}' => [Module\Attach::class,       [R::GET]],
+	'/attach/{item:\d+}/poster' => [Module\Udp\AttachPoster::class, [R::GET]], // UDP: video poster frame (thumb from udp-media)
 
 	// Mastodon route used by Fedifind to follow people who set their Webfinger address in their Twitter bio
 	'/authorize_interaction' => [Module\Contact\Follow::class, [R::GET, R::POST]],

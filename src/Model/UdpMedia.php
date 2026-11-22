@@ -25,6 +25,48 @@ class UdpMedia
 	const REF_ATTACH = 'attach';
 
 	/**
+	 * If $url is one of this node's /attach/{id} URLs, return the attach id, else 0.
+	 */
+	public static function localAttachId(string $url): int
+	{
+		if (DI::baseUrl()->isLocalUrl($url) && preg_match('#/attach/(\d+)(?:[?\#].*)?$#', $url, $m)) {
+			return (int) $m[1];
+		}
+		return 0;
+	}
+
+	/**
+	 * Image data of the upload-time thumbnail for a video attachment, or null.
+	 *
+	 * Callers must check permission on the attachment themselves — the thumbnail
+	 * photo is stored owner-only, so this bypasses the photo ACL on purpose.
+	 */
+	public static function getAttachThumbData(int $attachId): ?array
+	{
+		$row = DBA::selectFirst('udp-media', ['thumb-resource-id'], ['ref-table' => self::REF_ATTACH, 'ref-id' => $attachId]);
+		// Ids written before the UploadChunk fix are 64 chars; photo.resource-id is
+		// char(32) and MariaDB truncated them on insert, so the real id is the first 32.
+		$resourceId = substr((string) ($row['thumb-resource-id'] ?? ''), 0, 32);
+		if ($resourceId === '') {
+			return null;
+		}
+
+		// Scale 1 is the 640px frame; fall back to the original.
+		$photo = Photo::selectFirst([], ['resource-id' => $resourceId, 'scale' => 1])
+			?: Photo::selectFirst([], ['resource-id' => $resourceId, 'scale' => 0]);
+		if (empty($photo)) {
+			return null;
+		}
+
+		$data = Photo::getImageDataForPhoto($photo);
+		if (empty($data)) {
+			return null;
+		}
+
+		return ['data' => $data, 'type' => $photo['type'] ?: 'image/jpeg', 'etag' => md5($resourceId . '-' . $photo['scale'] . '-' . $photo['edited'])];
+	}
+
+	/**
 	 * Insert a new udp-media record. Called immediately after a successful
 	 * photo or attach store so every upload is indexed from the start.
 	 *

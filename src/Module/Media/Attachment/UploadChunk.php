@@ -25,7 +25,6 @@ use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Object\Image;
 use Friendica\Util\Profiler;
-use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 class UploadChunk extends BaseModule
@@ -244,10 +243,12 @@ class UploadChunk extends BaseModule
 			return '';
 		}
 
-		$resourceId = Strings::getRandomHex();
+		// photo.resource-id is char(32); Strings::getRandomHex() defaults to 64 chars,
+		// which MariaDB silently truncated, leaving udp-media pointing at a missing id.
+		$resourceId = Photo::newResource();
 
 		try {
-			Photo::storeWithPreview(
+			$stored = Photo::storeWithPreview(
 				$image,
 				$uid,
 				$resourceId,
@@ -261,6 +262,12 @@ class UploadChunk extends BaseModule
 				''
 			);
 		} catch (\Throwable $e) {
+			$this->logger->warning('UDP: thumbnail store threw', ['error' => $e->getMessage()]);
+			return '';
+		}
+
+		if ($stored < 0) {
+			$this->logger->warning('UDP: thumbnail store failed', ['resource-id' => $resourceId]);
 			return '';
 		}
 

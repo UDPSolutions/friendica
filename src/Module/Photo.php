@@ -12,7 +12,9 @@ use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Model\Attach as MAttach;
 use Friendica\Model\Photo as MPhoto;
+use Friendica\Model\UdpMedia;
 use Friendica\Model\Post;
 use Friendica\Core\Storage\Type\ExternalResource;
 use Friendica\Core\Storage\Type\SystemResource;
@@ -262,6 +264,31 @@ class Photo extends BaseApi
 				if (empty($media)) {
 					return false;
 				}
+
+				// UDP: local video attachments use the upload-time thumbnail. Without this,
+				// the ffmpeg branch below opened our own /attach/{id} over HTTP — a second
+				// PHP worker streaming the whole video from S3 to grab frame 0 — and under
+				// load those self-fetches starved the FPM pool. Never ffmpeg our own /attach.
+				$attachId = ($media['type'] == Post\Media::VIDEO && empty($media['preview'])) ? UdpMedia::localAttachId((string) $media['url']) : 0;
+				if ($attachId) {
+					$attach = MAttach::getByIdWithPermission($attachId);
+					if ($attach === false) {
+						return false;
+					}
+					$thumb = UdpMedia::getAttachThumbData($attachId);
+					if ($thumb !== null) {
+						$photo              = MPhoto::createPhotoForImageData($thumb['data'], $thumb['type']);
+						$photo['cacheable'] = ($attach['allow_cid'] . $attach['allow_gid'] . $attach['deny_cid'] . $attach['deny_gid']) === '';
+						return $photo;
+					}
+					if (!empty($media['blurhash']) && !empty($media['width']) && !empty($media['height'])) {
+						$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
+						$image->getFromBlurHash($media['blurhash'], $media['width'], $media['height']);
+						return MPhoto::createPhotoForImageData($image->asString());
+					}
+					return false;
+				}
+
 				$url    = $media['preview'];
 				$width  = $media['preview-width'];
 				$height = $media['preview-height'];

@@ -1889,9 +1889,18 @@ class BBCode
 		$text = preg_replace_callback("/\[(audio)\](.*?)\[\/audio\]/ism", [self::class, 'sanitizeLinksCallback'], $text);
 
 		if (in_array($simple_html, [self::NPF, self::INTERNAL, self::EXTERNAL])) {
-			$text = preg_replace(
+			// UDP: don't let browsers pre-fetch our own videos — /attach streams the whole
+			// file through PHP. Local attachments show the upload-time thumbnail and load
+			// on play; remote videos fetch metadata only (from their server, not us).
+			$text = preg_replace_callback(
 				"/\[video\](.*?)\[\/video\]/ism",
-				'</p><video src="$1" controls width="100%" height="auto">$1</video><p>',
+				function ($match) {
+					$attachId = \Friendica\Model\UdpMedia::localAttachId($match[1]);
+					$attrs    = $attachId
+						? 'preload="none" poster="' . DI::baseUrl() . '/attach/' . $attachId . '/poster"'
+						: 'preload="metadata"';
+					return '</p><video src="' . $match[1] . '" controls ' . $attrs . ' width="100%" height="auto">' . $match[1] . '</video><p>';
+				},
 				$text,
 			);
 			$text = preg_replace(
