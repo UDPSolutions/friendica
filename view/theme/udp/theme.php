@@ -263,9 +263,11 @@ function udp_help_box(): void
 		if (\Friendica\Util\UdpHelpFeed::isHidden($uid)) {
 			return;
 		}
-		$items = \Friendica\Util\UdpHelpFeed::forPage(
-			\Friendica\Util\UdpHelpFeed::currentPageKey(),
-			DI::userSession()->isSiteAdmin()
+		$isAdmin = DI::userSession()->isSiteAdmin();
+		// Items with a topic also get "Show me on this server" (a spotlight trail from UdpWelcome::trails()).
+		$items = \Friendica\Util\UdpWelcome::withTrails(
+			\Friendica\Util\UdpHelpFeed::forPage(\Friendica\Util\UdpHelpFeed::currentPageKey(), $isAdmin),
+			$isAdmin
 		);
 		DI::page()['footer'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('udp/help_box.tpl'), [
 			'$items'               => $items,
@@ -280,9 +282,9 @@ function udp_help_box(): void
 }
 
 /**
- * Spotlight runtime ("Show me where" in the tour), on every page for logged-in local users so a
+ * Spotlight runtime ("Show me where" in the tour, "Show me on this server" in help), on every page for logged-in local users so a
  * multi-hop path (e.g. Menu → Contacts → » → Send an invitation) keeps highlighting across page loads.
- * Inert unless the tour started a trail (sessionStorage). Template: udp/spot.tpl
+ * Inert unless a trail was started (sessionStorage). Template: udp/spot.tpl
  */
 function udp_spot_runtime(): void
 {

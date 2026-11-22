@@ -8,11 +8,14 @@
   * On each page (and shortly after each tapped hop, for same-page reveals like menus and side panels)
   * it highlights the furthest remaining hop that is visible here. Tapping the target advances the trail;
   * Stop / Esc / tapping the dim area ends it. If no remaining hop is visible on a fresh page, it ends quietly.
+  * The last hop is the destination: its callout says "You're there" and offers Done instead of Stop.
+  * Started from the tour (ret = tour step) or from a help-box / help-page link (no ret).
   *}}
 <div id="udp-spot" class="udp-spot" hidden>
 	<div class="udp-spot-mask"></div>
 	<div class="udp-spot-ring" aria-hidden="true"></div>
 	<div class="udp-spot-callout" role="dialog" aria-live="polite">
+		<p class="udp-spot-there" hidden><i class="fa fa-check-circle" aria-hidden="true"></i> You're there</p>
 		<p class="udp-spot-text"></p>
 		<div class="udp-spot-actions">
 			<button type="button" class="btn btn-default btn-sm udp-spot-stop">Stop</button>
@@ -30,6 +33,8 @@
 	var callout = box.querySelector('.udp-spot-callout');
 	var textEl = box.querySelector('.udp-spot-text');
 	var back = box.querySelector('.udp-spot-back');
+	var there = box.querySelector('.udp-spot-there');
+	var stopBtn = box.querySelector('.udp-spot-stop');
 	var trail = null, current = null;
 
 	function load() {
@@ -47,10 +52,25 @@
 		try { return document.querySelectorAll(sel); } catch (e) { return []; }
 	}
 	// Displayed and horizontally on screen; vertical is fixed by scrolling (e.g. a long side panel).
+	// Off screen sideways counts as hidden (frio's closed side panel is translated off canvas), unless
+	// it sits in a sideways-scrolling strip that is itself on screen (the mobile tab strip): show() scrolls it in.
 	function shown(el) {
 		if (!el.getClientRects().length) return false;
 		var r = el.getBoundingClientRect(), cs = getComputedStyle(el);
-		return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && r.right > 0 && r.left < innerWidth;
+		if (!(r.width > 0 && r.height > 0 && cs.visibility !== 'hidden')) return false;
+		if (r.right > 0 && r.left < innerWidth) return true;
+		for (var p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+			if (/(auto|scroll)/.test(getComputedStyle(p).overflowX)) {
+				var pr = p.getBoundingClientRect();
+				return pr.width > 0 && pr.right > 0 && pr.left < innerWidth;
+			}
+		}
+		return false;
+	}
+	// Server redirects (circle → circle/none) land below the expected page; that still counts as arriving.
+	function arrived(where) {
+		var here = norm(location.pathname);
+		return here === where || here.indexOf(where + '/') === 0;
 	}
 	function onPage(hop) {
 		if (!hop.page) return true;
@@ -113,14 +133,19 @@
 	function show(fresh) {
 		if (!trail) return false;
 		// A fresh page that isn't where the trail was heading means the person went elsewhere: end quietly.
-		if (fresh && trail.where && trail.where !== norm(location.pathname)) { stop(); return false; }
+		if (fresh && trail.where && !arrived(trail.where)) { stop(); return false; }
 		var hit = find(trail.path, trail.at || 0);
 		if (!hit) { if (fresh) stop(); return false; }
 		current = hit;
 		var r = hit.el.getBoundingClientRect();
-		if (r.top < 0 || r.bottom > innerHeight) {
-			hit.el.scrollIntoView({ block: 'center' });
+		if (r.top < 0 || r.bottom > innerHeight || r.right > innerWidth || r.left < 0) {
+			hit.el.scrollIntoView({ block: 'center', inline: 'center' });
 		}
+		var last = hit.hop >= trail.path.length - 1;
+		there.hidden = !last;
+		stopBtn.textContent = last ? 'Done' : 'Stop';
+		stopBtn.classList.toggle('btn-primary', last);
+		stopBtn.classList.toggle('btn-default', !last);
 		textEl.textContent = hit.text;
 		back.hidden = !trail.ret;
 		if (trail.ret) back.setAttribute('href', trail.ret);
@@ -132,7 +157,7 @@
 	}
 
 	mask.addEventListener('click', stop);
-	box.querySelector('.udp-spot-stop').addEventListener('click', stop);
+	stopBtn.addEventListener('click', stop);
 	back.addEventListener('click', function () { trail = null; save(); });
 	document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) stop(); });
 	addEventListener('resize', function () { if (!box.hidden) { hide(); show(false); } });

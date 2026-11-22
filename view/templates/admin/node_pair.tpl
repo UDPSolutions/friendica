@@ -100,7 +100,7 @@
 	</div>
 
 	<div style="display:flex; gap:2em; flex-wrap:wrap; margin-top:1.5em;">
-		<div class="well" style="flex:1; min-width:220px;">
+		<div class="well" data-udp-spot="pair-share" style="flex:1; min-width:220px;">
 			<h3>Share my node</h3>
 			<p>Generate a pairing token that another admin can scan or paste into their node.</p>
 			<form action="{{$baseurl}}/admin/node-pair/generate" method="post">

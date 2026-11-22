@@ -302,7 +302,7 @@
 				<div class="compose-editor-pane">
 					<div id="dropzone-{{$id}}" class="dropzone">
 						<p>
-							<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control text-autosize expandable-textarea" name="body" placeholder="{{$l10n.default}}" rows="18" tabindex="3" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
+							<textarea id="comment-edit-text-{{$id}}" data-udp-spot="compose-body" class="comment-edit-text form-control text-autosize expandable-textarea" name="body" placeholder="{{$l10n.default}}" rows="18" tabindex="3" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
 						</p>
 					</div>
 					<div id="compose-chip-strip-{{$id}}"></div>

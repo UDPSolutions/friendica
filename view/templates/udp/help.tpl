@@ -1,5 +1,5 @@
 <div class="generic-page-wrapper udp-help-page">
-<h2>Help</h2>
+<h2 data-udp-spot="help-page">Help</h2>
 
 {{if $logged_in}}
 <h3>New here?</h3>
@@ -11,7 +11,17 @@
 {{if $guide}}
 <ul class="udp-help-list">
 	{{foreach $guide as $item}}
-	<li><a href="{{$item.url}}" target="_blank" rel="noopener">{{$item.title}} <i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+	<li>
+		{{if $item.trail}}
+		<span class="udp-help-item-title">{{$item.title}}</span>
+		<span class="udp-help-item-links">
+			<button type="button" class="udp-help-here" data-path="{{$item.trail}}" hidden><i class="fa fa-hand-pointer-o" aria-hidden="true"></i> Show me on this server</button>
+			<a href="{{$item.url}}" target="_blank" rel="noopener"><i class="fa fa-book" aria-hidden="true"></i> Show me at the blog <i class="fa fa-external-link" aria-hidden="true"></i></a>
+		</span>
+		{{else}}
+		<a href="{{$item.url}}" target="_blank" rel="noopener">{{$item.title}} <i class="fa fa-external-link" aria-hidden="true"></i></a>
+		{{/if}}
+	</li>
 	{{/foreach}}
 </ul>
 {{/if}}
@@ -21,7 +31,17 @@
 <h3>For node admins</h3>
 <ul class="udp-help-list">
 	{{foreach $admin_guide as $item}}
-	<li><a href="{{$item.url}}" target="_blank" rel="noopener">{{$item.title}} <i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+	<li>
+		{{if $item.trail}}
+		<span class="udp-help-item-title">{{$item.title}}</span>
+		<span class="udp-help-item-links">
+			<button type="button" class="udp-help-here" data-path="{{$item.trail}}" hidden><i class="fa fa-hand-pointer-o" aria-hidden="true"></i> Show me on this server</button>
+			<a href="{{$item.url}}" target="_blank" rel="noopener"><i class="fa fa-book" aria-hidden="true"></i> Show me at the blog <i class="fa fa-external-link" aria-hidden="true"></i></a>
+		</span>
+		{{else}}
+		<a href="{{$item.url}}" target="_blank" rel="noopener">{{$item.title}} <i class="fa fa-external-link" aria-hidden="true"></i></a>
+		{{/if}}
+	</li>
 	{{/foreach}}
 </ul>
 {{/if}}
@@ -70,3 +90,17 @@
 {{/if}}
 
 </div>
+
+<script>
+/* "Show me on this server" (items with a WordPress "Show-me trail"): hand the trail to the spotlight
+   runtime (theme udp/spot.tpl, injected after this page's content — wait for it). */
+document.addEventListener('DOMContentLoaded', function () {
+	if (!window.udpSpot) return;
+	document.querySelectorAll('.udp-help-list .udp-help-here').forEach(function (btn) {
+		var path = [];
+		try { path = JSON.parse(btn.getAttribute('data-path') || '[]'); } catch (e) {}
+		btn.hidden = !window.udpSpot.canShow(path);
+		btn.addEventListener('click', function () { window.udpSpot.start(path, ''); });
+	});
+});
+</script>

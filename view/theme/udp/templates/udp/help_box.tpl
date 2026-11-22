@@ -2,6 +2,8 @@
   * UDP floating help box — injected into the page footer by udp_help_box() in theme.php.
   * Links come from blog.udp.social via UdpHelpFeed (server-side cached). Plan: ~/udp/Help-Box-Plan.md
   * Open/collapsed state is a per-browser convenience (localStorage); hidden/shown is pconfig.
+  * Items with a trail (WordPress "Show-me trail" → UdpWelcome::trails()) show two links: "Show me on this
+  * server" starts the spotlight runtime (udp/spot.tpl) right here; "Show me at the blog" opens the article.
   *}}
 <div id="udp-help" class="udp-help">
 	<div id="udp-help-panel" class="udp-help-panel panel panel-default" role="dialog" aria-labelledby="udp-help-title" hidden>
@@ -11,7 +13,17 @@
 		</div>
 		<ul class="udp-help-links">
 			{{foreach $items as $item}}
+			{{if $item.trail}}
+			<li class="udp-help-item-pair">
+				<span class="udp-help-item-title">{{$item.title}}</span>
+				<span class="udp-help-item-links">
+					<button type="button" class="udp-help-here" data-path="{{$item.trail}}" hidden><i class="fa fa-hand-pointer-o" aria-hidden="true"></i> Show me on this server</button>
+					<a href="{{$item.url}}" target="_blank" rel="noopener"><i class="fa fa-book" aria-hidden="true"></i> Show me at the blog</a>
+				</span>
+			</li>
+			{{else}}
 			<li><a href="{{$item.url}}" target="_blank" rel="noopener">{{$item.title}}</a></li>
+			{{/if}}
 			{{foreachelse}}
 			<li><a href="{{$help_center_url}}" target="_blank" rel="noopener">Open the user guide</a></li>
 			{{/foreach}}
@@ -40,7 +52,22 @@
 	var toggle = document.getElementById('udp-help-toggle');
 	document.body.classList.add('udp-help-on');
 
+	// "Show me on this server": offered only where the trail can start on this page. The spotlight
+	// runtime is injected after this script, so look it up when needed, not at load.
+	var hereBtns = root.querySelectorAll('.udp-help-here');
+	function trailOf(btn) { try { return JSON.parse(btn.getAttribute('data-path') || '[]'); } catch (e) { return []; } }
+	function checkHere() {
+		hereBtns.forEach(function (btn) { btn.hidden = !(window.udpSpot && window.udpSpot.canShow(trailOf(btn))); });
+	}
+	hereBtns.forEach(function (btn) {
+		btn.addEventListener('click', function () {
+			setOpen(false, true);
+			if (window.udpSpot) window.udpSpot.start(trailOf(btn), '');
+		});
+	});
+
 	function setOpen(open, remember) {
+		if (open) checkHere();
 		panel.hidden = !open;
 		toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
 		root.classList.toggle('udp-help-open', open);

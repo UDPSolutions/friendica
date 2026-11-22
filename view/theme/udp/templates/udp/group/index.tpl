@@ -2,7 +2,7 @@
 <div class="generic-page-wrapper">
 	<h2>{{$title}}</h2>
 
-	<p><a href="{{$create_url}}" class="btn btn-primary">{{$create_label}}</a></p>
+	<p><a href="{{$create_url}}" data-udp-spot="group-create" class="btn btn-primary">{{$create_label}}</a></p>
 
 	{{if $circles}}
 		<div class="list-group">

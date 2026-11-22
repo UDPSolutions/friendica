@@ -67,7 +67,9 @@ class UdpHelpFeed
 	/**
 	 * All published help items (any audience), sorted as WordPress returned them.
 	 *
-	 * @return array<int, array{title: string, url: string, pages: string[], order: int, audience: string}>
+	 * topic = a spotlight trail key (UdpWelcome::trails()), or '' — WordPress field "Show-me trail".
+	 *
+	 * @return array<int, array{title: string, url: string, pages: string[], order: int, audience: string, topic: string}>
 	 */
 	public static function items(): array
 	{
@@ -212,6 +214,7 @@ class UdpHelpFeed
 			'pages'    => $pages,
 			'order'    => (int) ($row['order'] ?? 0),
 			'audience' => ($row['audience'] ?? 'user') === 'admin' ? 'admin' : 'user',
+			'topic'    => preg_replace('/[^a-z0-9_-]/', '', strtolower((string) ($row['topic'] ?? ''))),
 		];
 	}
 }

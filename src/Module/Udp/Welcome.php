@@ -64,8 +64,10 @@ class Welcome extends BaseModule
 			'$prev'                => $index > 0 ? $index - 1 : null,
 			'$next'                => $index < $count - 1 ? $index + 1 : null,
 			'$is_last'             => $index === $count - 1,
-			// Multi-hop spotlight path for "Show me where" (theme udp/spot.tpl runtime follows it across pages).
-			'$path_json'           => json_encode($step['path'] ?? [], JSON_UNESCAPED_UNICODE),
+			// "Show me" buttons, each a multi-hop spotlight path (theme udp/spot.tpl runtime follows it across pages),
+			// and the matching blog article (WordPress "Show-me trail" field), if one is tagged.
+			'$show_buttons'        => UdpWelcome::stepButtons($step, $isAdmin),
+			'$blog_url'            => UdpWelcome::stepBlogUrl($step, $isAdmin),
 			'$form_security_token' => self::getFormSecurityToken(self::FORM_TOKEN),
 		]);
 	}

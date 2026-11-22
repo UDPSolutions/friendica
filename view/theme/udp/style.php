@@ -634,6 +634,32 @@ aside .vcard .p-addr { word-break: break-all; }
 	border-bottom: 1px solid rgba(128,128,128,0.2);
 }
 .udp-help-links li:last-child a { border-bottom: none; }
+/* Two-link items: article title, then "Show me on this server" · "Show me at the blog".
+   Used in the floating box and on /help (.udp-help-list). */
+.udp-help-links li.udp-help-item-pair {
+	padding: 8px 2px;
+	border-bottom: 1px solid rgba(128,128,128,0.2);
+}
+.udp-help-links li.udp-help-item-pair:last-child { border-bottom: none; }
+.udp-help-links li.udp-help-item-pair a { display: inline; padding: 0; border: none; }
+.udp-help-item-title { display: block; font-weight: 600; margin-bottom: 4px; }
+.udp-help-item-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	font-size: 0.92em;
+}
+.udp-help-here {
+	background: none;
+	border: none;
+	padding: 0;
+	color: <?= !empty($link_color) ? $link_color : '#337ab7' ?>; /* match frio's link colour */
+	cursor: pointer;
+	text-align: left;
+}
+.udp-help-here:hover { text-decoration: underline; }
+.udp-help-here[hidden] { display: none; }
+.udp-help-list li { margin-bottom: 8px; }
 .udp-help-foot {
 	display: flex;
 	align-items: center;
@@ -656,7 +682,6 @@ aside .vcard .p-addr { word-break: break-all; }
 }
 .udp-help-hide:hover { opacity: 1; }
 body.udp-help-on #back-to-top { bottom: 72px; }
-.udp-help-list li { margin-bottom: 4px; }
 
 @media (max-width: 767px) {
 	/* Clear the fixed bottom nav (56px + iOS safe area); icon-only button */
@@ -742,7 +767,8 @@ body.udp-help-on #back-to-top { bottom: 72px; }
 .udp-tour-nav form { margin: 0; }
 .udp-tour-nav .btn { min-height: 44px; padding-left: 18px; padding-right: 18px; }
 .udp-tour-try { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
-#udp-spot-show[hidden] { display: none; } /* .btn's display would otherwise beat [hidden] */
+.udp-spot-show[hidden] { display: none; } /* .btn's display would otherwise beat [hidden] */
+.udp-tour-blog { margin-top: 10px; font-weight: 600; }
 
 /* Tour spotlight (udp/welcome.tpl): dim everything except one real nav button.
    z-index above the nav bars (1020), help box (1030) and the mobile menu/compose sheets (2000),
@@ -776,6 +802,7 @@ body.udp-help-on #back-to-top { bottom: 72px; }
 	line-height: 1.4;
 }
 .udp-spot-text { margin: 0 0 10px; }
+.udp-spot-there { margin: 0 0 4px; font-weight: 700; color: #1a7f37; }
 .udp-spot-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .udp-spot-back[hidden] { display: none; }
 @keyframes udp-spot-pulse {

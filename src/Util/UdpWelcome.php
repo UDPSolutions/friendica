@@ -67,7 +67,8 @@ class UdpWelcome
 
 	/**
 	 * The walkthrough. Each step: key, icon (Font Awesome 4 name), title, body (trusted HTML —
-	 * dynamic values are escaped here), optional try_url/try_label (a local path to see it for real).
+	 * dynamic values are escaped here), optional try_url/try_label (a local path to see it for real),
+	 * optional show = trail keys from trails() for the "Show me" buttons (list, or key => button label).
 	 * Admin-only steps are spliced in after the welcome step for the node owner.
 	 */
 	public static function steps(bool $isAdmin, bool $postPending = false): array
@@ -108,12 +109,7 @@ class UdpWelcome
 					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Our experience is that sitting with someone for five minutes beats any invitation email. Help them make their first post.</p>',
 				'try_url'   => 'invite',
 				'try_label' => 'Invite someone',
-				'path'      => [
-					['spot' => [['menu', 'Tap Menu ⋮.']]],
-					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
-					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
-					['page' => 'contact', 'spot' => [['invite', 'Send an invitation from here.']]],
-				],
+				'show'      => ['invite'],
 			],
 			[
 				'key'       => 'neighbors',
@@ -123,12 +119,7 @@ class UdpWelcome
 					. '<p>Paired communities make up your <strong>neighborhood</strong>. Posts marked "Your neighborhood" reach them, and nobody else.</p>',
 				'try_url'   => 'admin/node-pair',
 				'try_label' => 'See node pairing',
-				'path'      => [
-					['spot' => [['menu', 'Tap Menu ⋮.']]],
-					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
-					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
-					['page' => 'contact', 'spot' => [['node-pair', 'Pair with another community here.']]],
-				],
+				'show'      => ['neighbors'],
 			],
 		];
 
@@ -141,9 +132,7 @@ class UdpWelcome
 					. '<p>Nothing is ranked or promoted. You see everything from the people you chose, in order, and nothing from anyone else.</p>',
 				'try_url'   => 'timeline',
 				'try_label' => 'Open your timeline',
-				'path'      => [
-					['spot' => [['timeline', 'This is Home: your timeline.']]],
-				],
+				'show'      => ['timeline'],
 			],
 			[
 				'key'       => 'posting',
@@ -158,11 +147,7 @@ class UdpWelcome
 					. '<p>New posts start out private. You widen the audience one post at a time, only when you mean to.</p>',
 				'try_url'   => 'compose',
 				'try_label' => 'Write a post',
-				'path'      => [
-					['spot' => [['post', 'Tap Post.'], ['timeline', 'Open Home.']]],
-					['spot' => [['compose-option', 'Choose "Compose a post".']]],
-					['page' => 'timeline', 'spot' => [['jot', 'Start a new post here.']]],
-				],
+				'show'      => ['posting'],
 			],
 			[
 				'key'       => 'connecting',
@@ -175,12 +160,7 @@ class UdpWelcome
 					. '</p>',
 				'try_url'   => 'contact',
 				'try_label' => 'Go to Contacts',
-				'path'      => [
-					['spot' => [['menu', 'Tap Menu ⋮.']]],
-					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
-					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
-					['page' => 'contact', 'spot' => [['follow-url', 'Type a name or paste an address here, then Follow.']]],
-				],
+				'show'      => ['connecting'],
 			],
 			[
 				'key'       => 'circles-groups',
@@ -195,10 +175,7 @@ class UdpWelcome
 					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Rule of thumb: a circle is <em>your</em> view of people; a group is a room you share with them.</p>',
 				'try_url'   => 'udp/group',
 				'try_label' => 'See your Groups',
-				'path'      => [
-					['spot' => [['menu', 'Tap Menu ⋮.']]],
-					['spot' => [['groups', 'Groups live here. Circles are on the Contacts page.'], ['m-groups', 'Tap Groups.']]],
-				],
+				'show'      => ['circles' => 'Show me Circles', 'groups' => 'Show me Groups'],
 			],
 			[
 				'key'       => 'profile',
@@ -208,10 +185,7 @@ class UdpWelcome
 					. '<p>Your profile isn\'t on the open web: search engines and strangers can\'t see it. You choose what goes on it.</p>',
 				'try_url'   => 'settings/profile/photo',
 				'try_label' => 'Add a photo',
-				'path'      => [
-					['spot' => [['profile', 'Tap Me for your profile.'], ['menu', 'Open your menu.']]],
-					['spot' => [['#nav-settings-link', 'Settings → Profile → Profile photo.']]],
-				],
+				'show'      => ['profile'],
 			],
 			[
 				'key'   => 'home-screen',
@@ -240,12 +214,7 @@ class UdpWelcome
 					. '<p class="udp-tour-tip"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> Busy sites post a lot. Put them in their own <strong>circle</strong> (say, "News") so they don\'t crowd out your people.</p>',
 				'try_url'   => 'contact',
 				'try_label' => 'Add a feed',
-				'path'      => [
-					['spot' => [['menu', 'Tap Menu ⋮.']]],
-					['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
-					['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
-					['page' => 'contact', 'spot' => [['follow-url', 'Paste the feed address here, then Follow.']]],
-				],
+				'show'      => ['feeds'],
 			],
 			[
 				'key'       => 'notifications',
@@ -255,9 +224,7 @@ class UdpWelcome
 					. '<p>Everything else waits under <strong>Alerts</strong> until you\'re ready. You can change this under Settings → Account.</p>',
 				'try_url'   => 'notification',
 				'try_label' => 'See your alerts',
-				'path'      => [
-					['spot' => [['alerts', 'Alerts: everything that\'s waiting for you.']]],
-				],
+				'show'      => ['notifications'],
 			],
 		];
 
@@ -270,13 +237,152 @@ class UdpWelcome
 				. ($isAdmin
 					? ($postPending ? '<p>That\'s it. Your first post is waiting in your timeline.</p>' : '<p>That\'s it. Questions? <a href="mailto:support@udp.social">support@udp.social</a> reaches a person.</p>')
 					: '<p>Questions? Ask <strong>' . $admin . '</strong>. That\'s what neighbors are for.</p>'),
-			'path'      => [
-				['spot' => [['menu', 'Tap Menu ⋮.']]],
-				['spot' => [['#nav-help-link', 'Help lives here.'], ['m-help', 'Help lives here.']]],
-			],
+			'show'      => ['help'],
 		];
 
 		return array_merge([$welcome], $isAdmin ? $adminSteps : [], $memberSteps, [$help]);
+	}
+
+	// ── Spotlight trails ("Show me where" / "Show me on this server") ─────────
+
+	/**
+	 * Spotlight trails by topic key. The tour's steps point at these ('show'), and so do help-box
+	 * articles: a WordPress article whose "Show-me trail" field holds a key here gets a
+	 * "Show me on this server" link next to its blog link.
+	 *
+	 * path = hops in order: {spot: [[key, label], …] (candidates in priority order), page?: 'contact'}.
+	 * key  = a data-udp-spot value or a CSS selector starting with # or [ (runtime: theme udp/spot.tpl).
+	 * Every trail ends ON the destination (the field or button you actually use there), and the runtime
+	 * tells the person "You're there" on that last hop. Keep it that way: a trail that ends on the
+	 * link to a page leaves people on a page with no idea what to do next.
+	 * Mobile reveals (Menu ⋮, the » side panel, collapsed widgets) are their own hops; on desktop they
+	 * are skipped automatically because the runtime jumps to the furthest hop already visible.
+	 */
+	public static function trails(bool $isAdmin): array
+	{
+		$toContacts = [
+			['spot' => [['menu', 'Tap Menu ⋮.']]],
+			['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
+			['page' => 'contact', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
+		];
+
+		$trails = [
+			'timeline' => [
+				['spot' => [['timeline', 'This is Home: your timeline. Newest conversations are on top.']]],
+			],
+			'posting' => [
+				['spot' => [['post', 'Tap Post.'], ['timeline', 'Open Home.']]],
+				['spot' => [['compose-option', 'Choose "Compose a post".']]],
+				['page' => 'timeline', 'spot' => [['jot', 'Tap here to start a new post.']]],
+				['page' => 'compose', 'spot' => [['compose-body', 'Write here. Before you send, pick who sees it.']]],
+			],
+			'connecting' => array_merge($toContacts, [
+				['page' => 'contact', 'spot' => [['follow-url', 'Type a name or paste an address here, then tap Follow.']]],
+			]),
+			'feeds' => array_merge($toContacts, [
+				['page' => 'contact', 'spot' => [['follow-url', 'Paste the feed address here, then tap Follow.']]],
+			]),
+			'invite' => array_merge($toContacts, [
+				['page' => 'contact', 'spot' => [['invite', 'Tap Send an invitation.']]],
+				['page' => 'udp/member-invite', 'spot' => [['#contact', 'Type their email address here, then send.']]],
+			]),
+			'circles' => [
+				['spot' => [['menu', 'Tap Menu ⋮.']]],
+				['spot' => [['contacts', 'Open Contacts.'], ['m-contacts', 'Tap Contacts.']]],
+				['page' => 'contact', 'spot' => [['[class~="flexMenu-viewMore"] > a', 'Open More.']]],
+				['page' => 'contact', 'spot' => [['[href="circle"]', 'Open Circles.']]],
+				['page' => 'circle', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
+				['page' => 'circle', 'spot' => [['#circle-sidebar-inflated', 'Tap Circles to open the list.']]],
+				['page' => 'circle', 'spot' => [['#sidebar-new-circle', 'Tap + to make a new circle, then add people to it.']]],
+			],
+			'groups' => [
+				['spot' => [['menu', 'Tap Menu ⋮.']]],
+				['spot' => [['groups', 'Open Groups.'], ['m-groups', 'Tap Groups.']]],
+				['page' => 'udp/group', 'spot' => [['group-create', 'Start a group here. Everyone you add can post to it.']]],
+			],
+			'profile' => [
+				['spot' => [['menu', 'Open your menu.']]],
+				['spot' => [['#nav-settings-link', 'Open Settings.'], ['m-settings', 'Tap Settings.']]],
+				['page' => 'settings', 'spot' => [['sidebar', 'Tap » to open the side panel.']]],
+				['page' => 'settings', 'spot' => [['[href="settings/profile"]', 'Open Profile.']]],
+				['page' => 'settings/profile', 'spot' => [['#photo-upload .accordion-toggle', 'Tap the profile photo section to open it.']]],
+				['page' => 'settings/profile', 'spot' => [['#profile-photo-upload', 'Choose a photo here, then tap Upload.']]],
+			],
+			'notifications' => [
+				['spot' => [['alerts', 'Alerts: everything that\'s waiting for you.']]],
+			],
+			'help' => [
+				['spot' => [['menu', 'Tap Menu ⋮.']]],
+				['spot' => [['#nav-help-link', 'Open Help.'], ['m-help', 'Tap Help.']]],
+				['page' => 'help', 'spot' => [['help-page', 'This is Help: guides, the tour, and how to reach a person.']]],
+			],
+		];
+
+		if ($isAdmin) {
+			$trails['neighbors'] = array_merge($toContacts, [
+				['page' => 'contact', 'spot' => [['node-pair', 'Tap Node pairing.']]],
+				['page' => 'admin/node-pair', 'spot' => [['pair-share', 'Make a pairing token here and send it to the other community\'s owner.']]],
+			]);
+		}
+
+		return $trails;
+	}
+
+	/**
+	 * A step's "Show me" buttons: [{label, path}], only for trails this viewer has.
+	 * 'show' is a list of trail keys (label "Show me where") or key => label.
+	 */
+	public static function stepButtons(array $step, bool $isAdmin): array
+	{
+		$trails  = self::trails($isAdmin);
+		$buttons = [];
+		foreach ($step['show'] ?? [] as $k => $v) {
+			[$key, $label] = is_int($k) ? [$v, 'Show me where'] : [$k, $v];
+			if (isset($trails[$key])) {
+				$buttons[] = ['label' => $label, 'path' => json_encode($trails[$key], JSON_UNESCAPED_UNICODE)];
+			}
+		}
+		return $buttons;
+	}
+
+	/**
+	 * Blog article for a step: the first help-feed item (visible to this viewer) tagged with one of
+	 * the step's trail keys. '' when none is tagged.
+	 */
+	public static function stepBlogUrl(array $step, bool $isAdmin): string
+	{
+		$keys = [];
+		foreach ($step['show'] ?? [] as $k => $v) {
+			$keys[] = is_int($k) ? $v : $k;
+		}
+		if (!$keys) {
+			return '';
+		}
+		try {
+			foreach (UdpHelpFeed::forAudience($isAdmin) as $item) {
+				if (in_array($item['topic'] ?? '', $keys, true)) {
+					return $item['url'];
+				}
+			}
+		} catch (\Throwable $e) {
+			// The blog link is optional; the tour must render without it.
+		}
+		return '';
+	}
+
+	/**
+	 * Help-feed items with a ready-to-use trail path ('trail' = JSON, or '' when the item has no
+	 * topic or this viewer has no such trail), for the help box and /help.
+	 */
+	public static function withTrails(array $items, bool $isAdmin): array
+	{
+		$trails = self::trails($isAdmin);
+		foreach ($items as &$item) {
+			$topic         = $item['topic'] ?? '';
+			$item['trail'] = ($topic !== '' && isset($trails[$topic]))
+				? json_encode($trails[$topic], JSON_UNESCAPED_UNICODE) : '';
+		}
+		return $items;
 	}
 
 	// ── Owner welcome post ────────────────────────────────────────────────────

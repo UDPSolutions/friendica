@@ -24,11 +24,16 @@
 		<h2>{{$step.title nofilter}}</h2>
 		<div class="udp-tour-body">{{$step.body nofilter}}</div>
 		<p class="udp-tour-try">
-			<button type="button" id="udp-spot-show" class="btn btn-default" data-path="{{$path_json}}" data-return="udp/welcome?step={{$index}}" hidden><i class="fa fa-hand-pointer-o" aria-hidden="true"></i> Show me where</button>
+			{{foreach $show_buttons as $b}}
+			<button type="button" class="btn btn-default udp-spot-show" data-path="{{$b.path}}" data-return="udp/welcome?step={{$index}}" hidden><i class="fa fa-hand-pointer-o" aria-hidden="true"></i> {{$b.label}}</button>
+			{{/foreach}}
 			{{if $step.try_url}}
 			<a href="{{$step.try_url}}" target="_blank" rel="noopener">{{$step.try_label}} <i class="fa fa-external-link" aria-hidden="true"></i></a>
 			{{/if}}
 		</p>
+		{{if $blog_url}}
+		<p class="udp-tour-blog"><a href="{{$blog_url}}" target="_blank" rel="noopener"><i class="fa fa-book" aria-hidden="true"></i> Read more at the blog <i class="fa fa-external-link" aria-hidden="true"></i></a></p>
+		{{/if}}
 	</div>
 
 	<div class="udp-tour-nav">
@@ -54,13 +59,14 @@
    highlighting hop by hop, across pages, until the destination is reached. */
 // The runtime is in the page footer, after this script — wait for it.
 document.addEventListener('DOMContentLoaded', function () {
-	var btn = document.getElementById('udp-spot-show');
-	if (!btn || !window.udpSpot) return;
-	var path = [];
-	try { path = JSON.parse(btn.getAttribute('data-path') || '[]'); } catch (e) {}
-	function check() { btn.hidden = !window.udpSpot.canShow(path); }
-	check();
-	addEventListener('resize', check);
-	btn.addEventListener('click', function () { window.udpSpot.start(path, btn.getAttribute('data-return')); });
+	if (!window.udpSpot) return;
+	document.querySelectorAll('.udp-spot-show').forEach(function (btn) {
+		var path = [];
+		try { path = JSON.parse(btn.getAttribute('data-path') || '[]'); } catch (e) {}
+		function check() { btn.hidden = !window.udpSpot.canShow(path); }
+		check();
+		addEventListener('resize', check);
+		btn.addEventListener('click', function () { window.udpSpot.start(path, btn.getAttribute('data-return')); });
+	});
 });
 </script>

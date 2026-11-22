@@ -19,6 +19,7 @@ use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Util\Profiler;
 use Friendica\Util\UdpHelpFeed;
+use Friendica\Util\UdpWelcome;
 use Psr\Log\LoggerInterface;
 
 class UdpHelp extends BaseModule
@@ -72,7 +73,7 @@ class UdpHelp extends BaseModule
 
 		$guide  = [];
 		$admins = [];
-		foreach (UdpHelpFeed::forAudience($isAdmin) as $item) {
+		foreach (UdpWelcome::withTrails(UdpHelpFeed::forAudience($isAdmin), $isAdmin) as $item) {
 			if ($item['audience'] === 'admin') {
 				$admins[] = $item;
 			} else {
