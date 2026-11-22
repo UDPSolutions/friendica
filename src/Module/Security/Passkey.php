@@ -54,6 +54,10 @@ final class Passkey extends BaseModule
 
 	protected function post(array $request = [])
 	{
+		if (!UdpPasskey::enabled()) {
+			$this->jsonError(404, ['error' => 'Not found']);
+		}
+
 		switch ($this->parameters['action'] ?? '') {
 			case 'login-options':
 				$this->loginOptions();

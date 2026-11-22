@@ -119,6 +119,7 @@ final class FirstLogin extends BaseModule
 			'$sitename'            => DI::config()->get('config', 'sitename'),
 			'$intro'               => $this->l10n->t("You're in! How would you like to sign in next time?"),
 			'$error'               => $this->formError,
+			'$passkeys_enabled'    => UdpPasskey::enabled(),
 			'$form_security_token' => self::getFormSecurityToken('first_login'),
 
 			// Passkey (shown only when the device has a built-in authenticator)

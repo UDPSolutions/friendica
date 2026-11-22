@@ -14,7 +14,7 @@
 	</div>
 	{{/if}}
 
-	{{if !$error}}
+	{{if !$error && $passkeys_enabled}}
 	<section id="first-login-passkey" data-udp-passkey-platform hidden>
 		<h2>{{$passkey_title}}</h2>
 		<p>{{$passkey_help}}</p>
@@ -40,7 +40,7 @@
 	</section>
 	{{/if}}
 
-	{{if !$error}}
+	{{if !$error && $passkeys_enabled}}
 	{{* No built-in authenticator, but the browser does passkeys: a password manager (LastPass,
 	    Bitwarden, KeePassXC) or a security key can still hold one. *}}
 	<p data-udp-passkey-other hidden>
@@ -48,7 +48,7 @@
 	</p>
 	{{/if}}
 
-	<section id="first-login-password" {{if !$error}}data-udp-passkey-noplatform{{/if}}>
+	<section id="first-login-password" {{if !$error && $passkeys_enabled}}data-udp-passkey-noplatform{{/if}}>
 		<h2>{{$password_title}}</h2>
 		<form id="first-login-form" action="firstlogin" method="post">
 			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">

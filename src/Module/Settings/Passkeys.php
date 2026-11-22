@@ -37,7 +37,7 @@ class Passkeys extends BaseSettings
 	protected function post(array $request = [])
 	{
 		$uid = $this->session->getLocalUserId();
-		if (!$uid) {
+		if (!$uid || !UdpPasskey::enabled()) {
 			return;
 		}
 
@@ -68,6 +68,10 @@ class Passkeys extends BaseSettings
 		$uid = $this->session->getLocalUserId();
 		if (!$uid) {
 			return Login::form('settings/passkeys');
+		}
+
+		if (!UdpPasskey::enabled()) {
+			$this->baseUrl->redirect('settings');
 		}
 
 		parent::content();

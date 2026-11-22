@@ -185,6 +185,7 @@ class Login extends BaseModule
 				'$privacylink'  => DI::l10n()->t('privacy policy'),
 
 				// UDP: passkeys + emailed sign-in link (used by view/theme/udp/templates/login.tpl)
+				'$passkeys_enabled'    => \Friendica\Security\UdpPasskey::enabled(),
 				'$passkey_label'       => DI::l10n()->t('Sign in with a passkey'),
 				'$passkey_options_url' => DI::baseUrl() . '/passkey/login-options',
 				'$passkey_login_url'   => DI::baseUrl() . '/passkey/login',

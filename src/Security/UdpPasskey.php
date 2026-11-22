@@ -33,6 +33,17 @@ final class UdpPasskey
 	/** Seconds the browser may wait for the authenticator. */
 	const CEREMONY_TIMEOUT = 120;
 
+	/**
+	 * Passkeys are a FUTURE FEATURE (shelved 2026-11-22: registration failed via LastPass
+	 * and via Windows→Android hybrid; the browser never reached /passkey/register).
+	 * Off unless `console config udp passkeys 1` — the harness K suite turns it on.
+	 * When off: no login button, no settings tab, no first-login option, endpoints 404.
+	 */
+	public static function enabled(): bool
+	{
+		return (bool)DI::config()->get('udp', 'passkeys', false);
+	}
+
 	public static function rpId(): string
 	{
 		return DI::baseUrl()->getHost();
