@@ -170,6 +170,34 @@ class Attach
 	}
 
 	/**
+	 * UDP: bytes $from..$to (inclusive) of an attachment, for HTTP Range responses.
+	 *
+	 * Backends that implement getRange() (the S3 addon) fetch only that slice;
+	 * everything else falls back to loading the whole file and slicing it.
+	 *
+	 * @param array $item Attachment record
+	 * @param int   $from First byte offset
+	 * @param int   $to   Last byte offset (inclusive)
+	 * @return string|null file data or null on failure
+	 */
+	public static function getDataRange(array $item, int $from, int $to): ?string
+	{
+		if (empty($item['data'])) {
+			try {
+				$backend = DI::storageManager()->getByName($item['backend-class'] ?? '');
+				if (method_exists($backend, 'getRange')) {
+					return $backend->getRange($item['backend-ref'], $from, $to);
+				}
+			} catch (\Throwable $e) {
+				DI::logger()->notice('Ranged read failed, falling back to full read', ['id' => $item['id'] ?? 0, 'error' => $e->getMessage()]);
+			}
+		}
+
+		$data = self::getData($item);
+		return is_null($data) ? null : substr($data, $from, $to - $from + 1);
+	}
+
+	/**
 	 * Store new file metadata in db and binary in default backend
 	 *
 	 * @param string  $data      Binary data
