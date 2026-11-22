@@ -63,15 +63,26 @@ function udp_init(AppHelper $appHelper)
 			. '</style>';
 	}
 
-	// Default compose visibility based on current URL context.
-	// /network/circle/{id}  → restrict to that circle; all other pages → no default (Public)
+	// Default compose audience based on current URL context.
+	// /network/circle/{id} → circle_allow={id}; /network/group/{id} → group_circle_id={id};
+	// all other pages → no default (account default). Compose.php validates both params
+	// (group membership is re-checked there), so these are only pre-fills.
+	// Applied to EVERY compose entry point — desktop jot button + dropdown (jot.tpl) and the
+	// mobile compose sheet (nav.tpl) — via a[data-udp-compose-link]. Single source of truth:
+	// do not add per-template param plumbing for these.
 	$_udp_uri  = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
 	$_udp_compose_defaults = null;
 	if (preg_match('#/network/circle/(\d+)$#', (string)$_udp_uri, $_m)) {
 		$_udp_compose_defaults = ['circle_allow' => $_m[1]];
+	} elseif (preg_match('#/network/group/(\d+)$#', (string)$_udp_uri, $_m)) {
+		$_udp_compose_defaults = ['group_circle_id' => $_m[1]];
 	}
 	if ($_udp_compose_defaults !== null) {
-		DI::page()['htmlhead'] .= '<script>window.UDP_COMPOSE_DEFAULTS=' . json_encode($_udp_compose_defaults) . ';</script>';
+		DI::page()['htmlhead'] .= '<script>window.UDP_COMPOSE_DEFAULTS=' . json_encode($_udp_compose_defaults) . ';'
+			. 'document.addEventListener("DOMContentLoaded",function(){var d=window.UDP_COMPOSE_DEFAULTS,q=[];'
+			. 'Object.keys(d).forEach(function(k){q.push(encodeURIComponent(k)+"="+encodeURIComponent(d[k]));});q=q.join("&");'
+			. 'document.querySelectorAll("a[data-udp-compose-link]").forEach(function(el){var h=el.getAttribute("href");'
+			. 'el.setAttribute("href",h+(h.indexOf("?")>=0?"&":"?")+q);});});</script>';
 	}
 
 	// Override editpost() so the "Edit" post menu navigates to the compose-edit

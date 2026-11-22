@@ -14,7 +14,7 @@
 </a>
 {{/if}}
 <div class="btn-group pull-right" id="jotOpen">
-	<a id="udp-jot-main" data-udp-spot="jot" class="action-button btn btn-primary" href="compose/{{$posttype}}{{if $group_circle_id}}?group_circle_id={{$group_circle_id}}{{elseif $content}}?body={{$content}}{{/if}}">
+	<a id="udp-jot-main" data-udp-spot="jot" data-udp-compose-link class="action-button btn btn-primary" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
 		<i class="fa fa-lg fa-pencil"></i>
 		<span>{{$new_post}}</span>
 	</a>
@@ -25,7 +25,7 @@
 	</button>
 	<ul class="dropdown-menu dropdown-menu-right">
 		<li>
-			<a id="udp-jot-timeline" href="compose/{{$posttype}}{{if $group_circle_id}}?group_circle_id={{$group_circle_id}}{{elseif $content}}?body={{$content}}{{/if}}">
+			<a id="udp-jot-timeline" data-udp-compose-link href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
 				<i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Compose a post
 			</a>
 		</li>
@@ -37,7 +37,6 @@
 		</li>
 	</ul>
 </div>
-<script>(function(){var d=window.UDP_COMPOSE_DEFAULTS;if(!d||!d.circle_allow)return;var p='circle_allow='+encodeURIComponent(d.circle_allow);['udp-jot-main','udp-jot-timeline'].forEach(function(id){var el=document.getElementById(id);if(!el)return;var h=el.getAttribute('href');el.setAttribute('href',h+(h.indexOf('?')>=0?'&':'?')+p);});}());</script>
 
 <div id="jot-content">
 	<div id="jot-sections">

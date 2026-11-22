@@ -641,7 +641,7 @@
 	<div class="udp-compose-sheet-backdrop"></div>
 	<div class="udp-compose-sheet-panel">
 		<div class="udp-compose-sheet-header">What would you like to share?</div>
-		<a href="{{$baseurl}}/compose" data-udp-spot="compose-option" class="udp-compose-option">
+		<a href="{{$baseurl}}/compose" data-udp-spot="compose-option" data-udp-compose-link class="udp-compose-option">
 			<span class="udp-compose-option-icon"><i class="fa fa-pencil" aria-hidden="true"></i></span>
 			<div class="udp-compose-option-text">
 				<strong>Compose a post</strong>
