@@ -132,6 +132,7 @@ final class FirstLogin extends BaseModule
 			'$passkey_js'          => Passkeys::scriptUrl(),
 			'$msg_duplicate'       => $this->l10n->t('This device already has a passkey for your account.'),
 			'$password_instead'    => $this->l10n->t('Set a password instead'),
+			'$passkey_other'       => $this->l10n->t('Use a passkey from a password manager or security key instead'),
 
 			// Password
 			'$password_title'      => $this->l10n->t('Choose a password'),

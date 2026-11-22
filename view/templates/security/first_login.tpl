@@ -40,6 +40,14 @@
 	</section>
 	{{/if}}
 
+	{{if !$error}}
+	{{* No built-in authenticator, but the browser does passkeys: a password manager (LastPass,
+	    Bitwarden, KeePassXC) or a security key can still hold one. *}}
+	<p data-udp-passkey-other hidden>
+		<a href="#first-login-passkey" data-udp-reveal="#first-login-passkey">{{$passkey_other}}</a>
+	</p>
+	{{/if}}
+
 	<section id="first-login-password" {{if !$error}}data-udp-passkey-noplatform{{/if}}>
 		<h2>{{$password_title}}</h2>
 		<form id="first-login-form" action="firstlogin" method="post">

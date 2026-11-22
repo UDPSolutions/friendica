@@ -197,6 +197,15 @@ final class Passkey extends BaseModule
 			null,  // any attachment: platform, security key or phone
 			UdpPasskey::credentialIdsForUser($uid)
 		);
+
+		// Password-manager compatibility (LastPass rejected registrations 2026-11-22):
+		// - lbuchs adds a nonstandard extension {"exts": true}; drop it.
+		// - lbuchs lists EdDSA (-8) first; many managers only do ES256 and some fail on the
+		//   first unsupported entry instead of skipping it. Order: ES256, RS256, EdDSA.
+		unset($args->publicKey->extensions);
+		$rank = [-7 => 0, -257 => 1, -8 => 2];
+		usort($args->publicKey->pubKeyCredParams, fn($a, $b) => ($rank[$a->alg] ?? 9) <=> ($rank[$b->alg] ?? 9));
+
 		UdpPasskey::storeChallenge('register', $server->getChallenge());
 		$this->jsonExit($args);
 	}

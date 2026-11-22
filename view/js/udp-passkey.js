@@ -13,6 +13,7 @@
  *   [data-udp-passkey-platform]  elements shown only when this device has a built-in authenticator
  *   [data-udp-passkey-noplatform] elements shown only when it does not
  *   [data-udp-passkey-unsupported] elements shown only when passkeys are unsupported
+ *   [data-udp-passkey-other]     shown when passkeys work but there is no built-in authenticator
  *   [data-udp-reveal="#id"]      link that un-hides #id and hides itself
  *   [data-udp-show-password="#id"] checkbox toggling a password field's visibility
  */
@@ -196,6 +197,7 @@
 		platform.then(function (has) {
 			toggle('[data-udp-passkey-platform]', has);
 			toggle('[data-udp-passkey-noplatform]', !has);
+			toggle('[data-udp-passkey-other]', supported && !has);
 		});
 
 		// [data-udp-reveal="#id"]: click to show a hidden section (e.g. "Set a password instead").
