@@ -35,6 +35,23 @@
 	</div>
 </form>
 
+{{* UDP: passwordless options — passkey (JS, hidden when unsupported) and emailed magic link *}}
+<div id="udp-login-alternatives"
+     data-udp-passkey-login
+     data-options-url="{{$passkey_options_url}}"
+     data-login-url="{{$passkey_login_url}}"
+     data-return-path="{{$passkey_return_path}}">
+	<p class="udp-login-or">{{$passkey_or}}</p>
+	<div data-udp-passkey-supported hidden>
+		<button type="button" class="btn btn-default btn-block udp-passkey-login-btn">
+			<i class="fa fa-key" aria-hidden="true"></i> {{$passkey_label}}
+		</button>
+	</div>
+	<div class="alert alert-danger udp-passkey-error" role="alert" hidden></div>
+	<a href="login/email" class="btn btn-link btn-block" id="udp-email-link">{{$email_link_label}}</a>
+</div>
+<script src="{{$passkey_js}}"></script>
+
 {{* Background image attribution — update when image changes *}}
 <p id="udp-login-attribution">
 	Photo by mypubliclands on Unsplash
