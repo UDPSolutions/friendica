@@ -78,15 +78,22 @@ class Attach extends BaseModule
 
 		if ($range !== null) {
 			[$from, $to] = $range;
-			$data = MAttach::getDataRange($item, $from, $to);
-			if (is_null($data) || strlen($data) !== $to - $from + 1) {
-				$this->logger->notice('Bad ranged data for attachment', ['id' => $item['id'], 'from' => $from, 'to' => $to, 'got' => is_null($data) ? null : strlen($data)]);
-				throw new \Friendica\Network\HTTPException\NotFoundException(DI::l10n()->t('Item was not found.'));
-			}
 			http_response_code(206);
 			header('Content-Range: bytes ' . $from . '-' . $to . '/' . $size);
-			header('Content-length: ' . strlen($data));
-			echo $data;
+			header('Content-length: ' . ($to - $from + 1));
+
+			// Stream straight through: drop any output buffers so bytes reach nginx
+			// as they arrive from storage instead of after the whole slice is read.
+			while (ob_get_level() > 0) {
+				ob_end_clean();
+			}
+
+			if (!MAttach::streamRange($item, $from, $to)) {
+				http_response_code(404);
+				header_remove('Content-Range');
+				header_remove('Content-length');
+				throw new \Friendica\Network\HTTPException\NotFoundException(DI::l10n()->t('Item was not found.'));
+			}
 			System::exit();
 		}
 
@@ -103,7 +110,7 @@ class Attach extends BaseModule
 	}
 
 	/** Largest slice served per range request; clients ask again for the rest. */
-	const MAX_RANGE_BYTES = 2 * 1024 * 1024;
+	const MAX_RANGE_BYTES = 8 * 1024 * 1024;
 
 	/**
 	 * Parse a single-range "Range: bytes=..." header.

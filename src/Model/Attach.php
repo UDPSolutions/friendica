@@ -198,6 +198,43 @@ class Attach
 	}
 
 	/**
+	 * UDP: send bytes $from..$to (inclusive) of an attachment to the client.
+	 *
+	 * Backends with streamRange() (the S3 addon) pipe storage straight to the
+	 * output as bytes arrive; others echo the getDataRange() slice. The caller
+	 * must have set all headers and closed output buffers first.
+	 *
+	 * @return bool false if nothing could be sent (caller may still send an error
+	 *              unless headers_sent()); true once data was handed to the client
+	 */
+	public static function streamRange(array $item, int $from, int $to): bool
+	{
+		if (empty($item['data'])) {
+			try {
+				$backend = DI::storageManager()->getByName($item['backend-class'] ?? '');
+				if (method_exists($backend, 'streamRange')) {
+					$backend->streamRange($item['backend-ref'], $from, $to, fopen('php://output', 'wb'));
+					return true;
+				}
+			} catch (\Throwable $e) {
+				DI::logger()->notice('Streamed read failed', ['id' => $item['id'] ?? 0, 'error' => $e->getMessage(), 'headers_sent' => headers_sent()]);
+				if (headers_sent()) {
+					return true; // partial response already on the wire; the client will retry the range
+				}
+			}
+		}
+
+		$data = self::getDataRange($item, $from, $to);
+		if (is_null($data) || strlen($data) !== $to - $from + 1) {
+			DI::logger()->notice('Bad ranged data for attachment', ['id' => $item['id'] ?? 0, 'from' => $from, 'to' => $to, 'got' => is_null($data) ? null : strlen($data)]);
+			return false;
+		}
+
+		echo $data;
+		return true;
+	}
+
+	/**
 	 * Store new file metadata in db and binary in default backend
 	 *
 	 * @param string  $data      Binary data
