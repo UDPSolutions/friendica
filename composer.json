@@ -42,6 +42,7 @@
 		"guzzlehttp/oauth-subscriber": "^0.8",
 		"james-heinrich/getid3": "^1.9",
 		"kornrunner/blurhash": "^1.2",
+		"lbuchs/webauthn": "^2.2",
 		"league/html-to-markdown": "^4.8",
 		"level-2/dice": "^4",
 		"lightopenid/lightopenid": "dev-master",
