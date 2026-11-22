@@ -77,6 +77,8 @@
 	var saved = null;
 	try { saved = localStorage.getItem(KEY); } catch (e) {}
 	setOpen(saved === '1', false);
+	// Opened from localStorage before the spotlight runtime (later in the footer) existed: check again once it does.
+	document.addEventListener('DOMContentLoaded', function () { if (!panel.hidden) checkHere(); });
 
 	toggle.addEventListener('click', function () { setOpen(panel.hidden, true); });
 	root.querySelector('.udp-help-close').addEventListener('click', function () {
