@@ -2312,6 +2312,25 @@ return [
 			"reviewer_uid" => ["reviewer_uid"],
 		],
 	],
+	"udp_passkey" => [
+		"comment" => "UDP Social WebAuthn passkeys (passwordless login). No attestation, no AAGUID stored.",
+		"fields" => [
+			"id"              => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
+			"uid"             => ["type" => "mediumint unsigned", "not null" => "1", "foreign" => ["user" => "uid"], "comment" => "Owner"],
+			"credential_hash" => ["type" => "char(64)", "not null" => "1", "comment" => "sha256 hex of the raw credential ID (lookup key)"],
+			"credential_id"   => ["type" => "text", "not null" => "1", "comment" => "Raw credential ID, base64url"],
+			"public_key"      => ["type" => "text", "not null" => "1", "comment" => "Credential public key, PEM"],
+			"sign_count"      => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "Last seen signature counter (0 for synced passkeys)"],
+			"name"            => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "User-chosen label"],
+			"created"         => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"last_used"       => ["type" => "datetime", "comment" => ""],
+		],
+		"indexes" => [
+			"PRIMARY"         => ["id"],
+			"credential_hash" => ["UNIQUE", "credential_hash"],
+			"uid"             => ["uid"],
+		],
+	],
 	"worker-ipc" => [
 		"comment" => "Inter process communication between the frontend and the worker",
 		"fields"  => [
